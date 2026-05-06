@@ -13,11 +13,13 @@ namespace EasyCore.Agent
     {
         private readonly AgentClientOptions _options;
         private readonly IAgentContextStore _contextStore;
+        private readonly int _maxContextCount;
 
         public BasicAgentClient(IOptions<AgentClientOptions> options, IServiceProvider serviceProvider)
         {
             _options = options.Value;
             _contextStore = serviceProvider.GetRequiredService<IAgentContextStore>();
+            _maxContextCount = _contextStore.GetMaxContextCount();
         }
 
         public AIAgent CreateAgent(string agentName, string instructions, IList<AITool>? tools = null)
@@ -63,11 +65,11 @@ namespace EasyCore.Agent
 
         public async Task<string> ChatRunAsync(string sessionId, AIAgent agent, string message, CancellationToken cancellationToken = default)
         {
-            var messages = _contextStore.GetAsync(sessionId);
+            var messages = _contextStore.Get(sessionId);
 
             messages.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, message));
 
-            while (messages.Count > 20)
+            while (messages.Count > _maxContextCount)
             {
                 messages.RemoveAt(0);
             }
@@ -78,7 +80,7 @@ namespace EasyCore.Agent
 
             messages.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.Assistant, answer));
 
-            _contextStore.SaveAsync(sessionId, messages);
+            _contextStore.Save(sessionId, messages);
 
             return answer;
         }
@@ -92,7 +94,7 @@ namespace EasyCore.Agent
             return answer;
         }
 
-        public void ClearChatContext(string sessionId) => _contextStore.ClearAsync(sessionId);
+        public void ClearChatContext(string sessionId) => _contextStore.Clear(sessionId);
 
         private string NormalizeApiKey(string? apiKey)
         {

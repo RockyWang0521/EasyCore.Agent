@@ -15,7 +15,7 @@ namespace EasyCore.Agent.ContextStore
             _options = options.Value;
         }
 
-        public IList<ChatMessage> GetAsync(string sessionId)
+        public IList<ChatMessage> Get(string sessionId)
         {
             var messages = Store.GetOrAdd(sessionId, _ => new List<ChatMessage>());
 
@@ -25,7 +25,7 @@ namespace EasyCore.Agent.ContextStore
             }
         }
 
-        public void SaveAsync(string sessionId, IList<ChatMessage> messages)
+        public void Save(string sessionId, IList<ChatMessage> messages)
         {
             var list = messages
                 .TakeLast(_options.MaxContextCount)
@@ -45,7 +45,12 @@ namespace EasyCore.Agent.ContextStore
                 });
         }
 
-        public void ClearAsync(string sessionId)
+        public int GetMaxContextCount()
+        {
+            return _options.MaxContextCount;
+        }
+
+        public void Clear(string sessionId)
         {
             Store.TryRemove(sessionId, out _);
         }

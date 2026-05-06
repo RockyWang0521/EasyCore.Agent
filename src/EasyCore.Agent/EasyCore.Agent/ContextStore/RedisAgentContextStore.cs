@@ -17,7 +17,7 @@ public sealed class RedisAgentContextStore : IAgentContextStore
         _redisCache = redisCache;
     }
 
-    public IList<ChatMessage> GetAsync(string sessionId)
+    public IList<ChatMessage> Get(string sessionId)
     {
         var key = BuildKey(sessionId);
 
@@ -38,7 +38,7 @@ public sealed class RedisAgentContextStore : IAgentContextStore
             .ToList();
     }
 
-    public void SaveAsync(string sessionId, IList<ChatMessage> messages)
+    public void Save(string sessionId, IList<ChatMessage> messages)
     {
         var key = BuildKey(sessionId);
 
@@ -56,7 +56,12 @@ public sealed class RedisAgentContextStore : IAgentContextStore
         _redisCache.Set(key, list);
     }
 
-    public void ClearAsync(string sessionId)
+    public int GetMaxContextCount()
+    {
+        return _options.MaxContextCount;
+    }
+
+    public void Clear(string sessionId)
     {
         var key = BuildKey(sessionId);
 

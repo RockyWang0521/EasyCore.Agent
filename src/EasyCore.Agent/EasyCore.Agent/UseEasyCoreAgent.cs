@@ -16,8 +16,6 @@ namespace EasyCore.Agent
 
             services.AddSingleton(options);
 
-            services.AddSingleton<IAIToolProvider, AIToolProvider>();
-
             if (options.AgentContextStoreType == AgentContextStoreType.Redis)
             {
                 services.EasyCoreDistributedCache(o =>
