@@ -1,28 +1,50 @@
-# EasyCore.Agent
+# 🚀 EasyCore.Agent
 
-> 一个面向 .NET 的轻量级 Agent 封装库：支持会话上下文（Memory / Redis）、基于特性自动发现工具（Tool Calling）、快速接入 OpenAI 兼容模型。
+> **EasyCore.Agent** 是一个面向 .NET 的轻量级 Agent SDK，提供会话上下文管理、Tool Calling 自动注册、以及 OpenAI 兼容模型接入能力。  
+> This project is a lightweight .NET Agent SDK with context memory, tool calling, and OpenAI-compatible model integration.
+
+<p align="center">
+  <img alt="dotnet" src="https://img.shields.io/badge/.NET-8+-512BD4?logo=dotnet" />
+  <img alt="csharp" src="https://img.shields.io/badge/C%23-12-239120?logo=csharp" />
+  <img alt="ai" src="https://img.shields.io/badge/AI-Agent-blueviolet" />
+  <img alt="redis" src="https://img.shields.io/badge/Context-Redis%20%7C%20Memory-red?logo=redis" />
+</p>
 
 ---
 
-## 目录
+## 🌍 Language
 
-- [1. 功能概览](#1-功能概览)
+- 中文（当前文档）
+- English: [README.en.md](./README.en.md)
+
+---
+
+## 📚 目录
+
+- [1. 项目简介](#1-项目简介)
 - [2. 架构图](#2-架构图)
-- [3. 快速开始](#3-快速开始)
-- [4. 配置说明](#4-配置说明)
-- [5. 工具开发（Tool）](#5-工具开发tool)
-- [6. 会话上下文管理](#6-会话上下文管理)
-- [7. 常见问题（FAQ）](#7-常见问题faq)
-- [8. 运行 Demo](#8-运行-demo)
+- [3. 核心特性](#3-核心特性)
+- [4. 快速开始](#4-快速开始)
+- [5. 配置说明](#5-配置说明)
+- [6. Tool 开发指南](#6-tool-开发指南)
+- [7. API 使用示例](#7-api-使用示例)
+- [8. 最佳实践](#8-最佳实践)
+- [9. FAQ](#9-faq)
+- [10. Demo 运行](#10-demo-运行)
 
 ---
 
-## 1. 功能概览
+## 1. 项目简介
 
-✅ 支持 OpenAI 兼容接口（可配置 `ApiKey` / `BaseUrl` / `Model`）  
-✅ 支持 Agent 上下文存储切换（Memory / Redis）  
-✅ 支持通过 `[AITool]` 自动发现并注册工具方法  
-✅ 支持多轮会话（按 `sessionId` 管理上下文）
+### 🎯 解决什么问题？
+
+在业务中直接使用大模型 SDK 时，通常会遇到：
+
+- 多轮会话上下文维护繁琐；
+- Tool 注册和函数调用接入成本高；
+- 不同存储模式（本地内存/Redis）切换不方便。
+
+**EasyCore.Agent** 通过统一抽象简化以上问题，让你更快构建可落地的 Agent 服务。
 
 ---
 
@@ -65,32 +87,40 @@ sequenceDiagram
 
 ---
 
-## 3. 快速开始
+## 3. 核心特性
 
-### 3.1 安装与引用
+- 🧠 **多轮上下文记忆**：支持按 `sessionId` 管理历史消息。
+- 🧩 **Tool Calling 自动注册**：通过 `[AITool]` 自动识别可调用方法。
+- 🗄️ **可切换上下文存储**：`Memory`（开发）与 `Redis`（生产）双模式。
+- 🔌 **OpenAI 兼容接入**：支持自定义 `BaseUrl` 与 `Model`。
+- 🧱 **清晰扩展点**：基于 `BasicAgentClient<TOptions>` 便于业务封装。
 
-将项目引入你的解决方案，并引用：
+---
 
-- `src/EasyCore.Agent/EasyCore.Agent/EasyCore.Agent.csproj`
+## 4. 快速开始
 
-### 3.2 服务注册
+### 4.1 引用项目
+
+将 `src/EasyCore.Agent/EasyCore.Agent/EasyCore.Agent.csproj` 引入你的解决方案。
+
+### 4.2 注册服务
 
 ```csharp
 using EasyCore.Agent;
 
 builder.Services.EasyCoreAgent(options =>
 {
-    options.AgentContextStoreType = AgentContextStoreType.Memory; // 或 Redis
+    options.AgentContextStoreType = AgentContextStoreType.Memory; // or Redis
     options.MaxContextCount = 20;
 
-    // Redis 模式下需要
+    // Redis optional config
     // options.EndPoints = "127.0.0.1:6379";
     // options.Password = "";
     // options.DistributedName = "easycore:agent:";
 });
 ```
 
-### 3.3 定义 Agent Client
+### 4.3 定义你的 Agent Client
 
 ```csharp
 public class DeepSeekAgent : BasicAgentClient<DeepSeekClientOptions>
@@ -104,10 +134,11 @@ public class DeepSeekAgent : BasicAgentClient<DeepSeekClientOptions>
 }
 ```
 
-### 3.4 发起会话
+### 4.4 创建 Agent 并对话
 
 ```csharp
 var tools = toolProvider.GetTools();
+
 var agent = agentClient.CreateAgent(
     agentName: "assistant",
     instructions: "你是一个专业助手",
@@ -121,9 +152,9 @@ var answer = await agentClient.ChatRunAsync(
 
 ---
 
-## 4. 配置说明
+## 5. 配置说明
 
-### 4.1 `AgentClientOptions`
+### 5.1 `AgentClientOptions`
 
 | 字段 | 说明 | 示例 |
 |---|---|---|
@@ -131,21 +162,21 @@ var answer = await agentClient.ChatRunAsync(
 | `BaseUrl` | 模型服务地址 | `https://api.openai.com/v1` |
 | `Model` | 模型名称 | `gpt-4.1-mini` |
 
-### 4.2 `AgentConfigOptions`
+### 5.2 `AgentConfigOptions`
 
-| 字段 | 说明 | 默认建议 |
+| 字段 | 说明 | 建议 |
 |---|---|---|
-| `AgentContextStoreType` | 上下文存储类型（Memory / Redis） | 本地开发用 Memory |
-| `MaxContextCount` | 上下文最大保留条数 | 20~50 |
+| `AgentContextStoreType` | 上下文存储类型（Memory/Redis） | 本地开发用 Memory |
+| `MaxContextCount` | 最大上下文条数 | 20~50 |
 | `EndPoints` | Redis 地址 | `127.0.0.1:6379` |
-| `Password` | Redis 密码 | 按实际配置 |
+| `Password` | Redis 密码 | 按环境配置 |
 | `DistributedName` | Redis Key 前缀 | `easycore:agent:` |
 
 ---
 
-## 5. 工具开发（Tool）
+## 6. Tool 开发指南
 
-### 5.1 编写工具方法
+### 6.1 定义工具类
 
 ```csharp
 public class WeatherTool
@@ -159,55 +190,68 @@ public class WeatherTool
 }
 ```
 
-### 5.2 自动注册机制
+### 6.2 注册机制说明
 
-框架会扫描运行目录中的程序集，寻找带有 `[AITool]` 的 `public instance method` 并注册为可调用工具。
-
----
-
-## 6. 会话上下文管理
-
-- `ChatRunAsync(sessionId, ...)`：基于会话上下文进行多轮对话。
-- `ChatRunAsync(agent, message)`：无状态单轮调用。
-- `ClearChatContext(sessionId)`：清空指定会话上下文。
-
-> 建议：生产环境优先 Redis，上下文可跨实例共享。
+系统会扫描运行目录程序集中的 `public` 实例方法，识别 `[AITool]` 并注册到 `IAIToolProvider`。
 
 ---
 
-## 7. 常见问题（FAQ）
+## 7. API 使用示例
 
-### Q1：为什么报 `ApiKey/BaseUrl/Model is not configured`？
-请确认相关配置非空且无不可见字符（如全角空格、换行符）。
+### 7.1 多轮会话（带上下文）
 
-### Q2：为什么工具没有生效？
+```csharp
+var answer = await agentClient.ChatRunAsync(sessionId, agent, userInput);
+```
+
+### 7.2 单轮调用（无上下文）
+
+```csharp
+var answer = await agentClient.ChatRunAsync(agent, "hello");
+```
+
+### 7.3 清空上下文
+
+```csharp
+agentClient.ClearChatContext(sessionId);
+```
+
+---
+
+## 8. 最佳实践
+
+- ✅ 生产环境优先使用 Redis，保障多实例上下文一致性。
+- ✅ 建议通过网关或中间件统一注入 `sessionId`。
+- ✅ 对 Tool 输入参数做业务校验，避免高风险调用。
+- ✅ 记录请求耗时与工具调用日志，便于排障和优化。
+
+---
+
+## 9. FAQ
+
+### ❓ Q1：`ApiKey/BaseUrl/Model is not configured` 报错？
+请确认配置非空，且不要包含不可见字符（如全角空格、换行）。
+
+### ❓ Q2：工具为什么没有被调用？
 请检查：
-1. 方法是否是 `public` 实例方法；
-2. 是否加了 `[AITool("tool_name")]`；
-3. 工具所在程序集是否被扫描到。
+1. 是否为 `public` 实例方法；
+2. 是否添加 `[AITool("tool_name")]`；
+3. 工具所在程序集是否被扫描。
 
-### Q3：上下文为什么丢失？
-- Memory 模式仅在进程内有效，应用重启后会丢失；
-- 需要持久化请切 Redis。
+### ❓ Q3：上下文为何丢失？
+- Memory 模式仅进程内有效；
+- 若需持久化/多实例共享，请使用 Redis。
 
 ---
 
-## 8. 运行 Demo
-
-项目内置了 ASP.NET Core 示例工程：
-
-- `demo/AspCoreAgent`
-
-运行方式：
+## 10. Demo 运行
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ```
 
-启动后可通过示例 Controller 调用 Agent 接口。
-
 ---
 
-## License
+## 📄 License
 
-请根据你的实际开源协议补充（MIT / Apache-2.0 / 私有协议）。
+请根据你的项目需求补充 License（MIT / Apache-2.0 / 私有协议）。
