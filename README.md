@@ -3,19 +3,17 @@
 > **EasyCore.Agent** 是一个面向 .NET 的轻量级 Agent SDK，提供会话上下文管理、Tool Calling 自动注册、以及 OpenAI 兼容模型接入能力。  
 > This project is a lightweight .NET Agent SDK with context memory, tool calling, and OpenAI-compatible model integration.
 
-<p align="center">
-  <img alt="dotnet" src="https://img.shields.io/badge/.NET-8+-512BD4?logo=dotnet" />
-  <img alt="csharp" src="https://img.shields.io/badge/C%23-12-239120?logo=csharp" />
-  <img alt="ai" src="https://img.shields.io/badge/AI-Agent-blueviolet" />
-  <img alt="redis" src="https://img.shields.io/badge/Context-Redis%20%7C%20Memory-red?logo=redis" />
-</p>
+![.NET](https://img.shields.io/badge/.NET-8%2B-512BD4?logo=dotnet)
+![C#](https://img.shields.io/badge/C%23-12-239120?logo=csharp)
+![AI Agent](https://img.shields.io/badge/AI-Agent-blueviolet)
+![Context](https://img.shields.io/badge/Context-Redis%20%7C%20Memory-red?logo=redis)
 
 ---
 
 ## 🌍 Language
 
 - 中文（当前文档）
-- English: [README.en.md](./README.en.md)
+- English: [README.en.md](https://github.com/RockyWang0521/EasyCore.Agent/blob/master/README.en.md)
 
 ---
 
@@ -30,7 +28,9 @@
 - [7. API 使用示例](#7-api-使用示例)
 - [8. 最佳实践](#8-最佳实践)
 - [9. FAQ](#9-faq)
-- [10. Demo 运行](#10-demo-运行)
+- [10. EasyCore.Agent 详细介绍](#10-easycoreagent-详细介绍)
+- [11. EasyCore.Agent.Workflow 详细介绍](#11-easycoreagentworkflow-详细介绍)
+- [12. Demo 运行](#12-demo-运行)
 
 ---
 
@@ -52,40 +52,11 @@
 
 ### 2.1 组件关系图
 
-```mermaid
-graph LR
-    A[Client / Controller] --> B[BasicAgentClient]
-    B --> C[AIAgent]
-    B --> D[IAgentContextStore]
-    D --> D1[MemoryAgentContextStore]
-    D --> D2[RedisAgentContextStore]
-    C --> E[IAIToolProvider]
-    E --> F[AIToolProvider]
-    F --> G[Tool Methods via AIToolAttribute]
-```
+![组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/architecture-cn.svg)
 
 ### 2.2 一次会话调用时序
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant API as Controller/API
-    participant BAC as BasicAgentClient
-    participant CS as IAgentContextStore
-    participant AG as AIAgent
-
-    U->>API: 发送 message + sessionId
-    API->>BAC: ChatRunAsync(sessionId, agent, message)
-    BAC->>CS: GetAsync(sessionId)
-    CS-->>BAC: 历史消息
-    BAC->>AG: RunAsync(messages)
-    AG-->>BAC: response.Text
-    BAC->>CS: SaveAsync(sessionId, messages + answer)
-    BAC-->>API: answer
-    API-->>U: 返回回复
-```
-
----
+![一次会话调用时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/sequence-cn.svg)  
 
 ## 3. 核心特性
 
@@ -101,7 +72,7 @@ sequenceDiagram
 
 ### 4.1 引用项目
 
-通过nuget 将 EasyCore.Agent 引入你的解决方案。
+通过nuget 将 `EasyCore.Agent` 引入你的解决方案。
 
 ### 4.2 注册服务
 
@@ -244,7 +215,511 @@ agentClient.ClearChatContext(sessionId);
 
 ---
 
-## 10. Demo 运行
+## 10. EasyCore.Agent 详细介绍
+
+### 10.1 设计目标
+
+`EasyCore.Agent` 的核心目标是：让你在 ASP.NET Core / 后端服务里，以更少样板代码完成 Agent 工程化接入。它重点解决三个问题：
+
+1. **上下文记忆**：按会话持久化消息历史，避免业务层重复拼接上下文；
+2. **Tool Calling**：通过特性自动发现工具方法，减少手工注册成本；
+3. **模型接入统一化**：对 OpenAI 兼容接口做统一封装，便于切换模型与 BaseUrl。
+
+### 10.2 核心能力拆解
+
+- **上下文存储抽象**：支持 `Memory` 和 `Redis` 两类上下文存储策略，可按环境切换。  
+- **Agent 客户端基类**：基于 `BasicAgentClient<TOptions>` 可快速派生业务 Agent 客户端。  
+- **工具扫描与注册**：扫描程序集中的 `public` 实例方法，识别 `[AITool]` 自动暴露为可调用工具。  
+- **统一会话入口**：通过 `ChatRunAsync` 支持单轮/多轮调用，并可按 `sessionId` 清理上下文。
+
+### 10.3 在业务中的推荐落地方式
+
+1. 用 DI 注册 `EasyCore.Agent`；
+2. 继承 `BasicAgentClient<TOptions>` 定义你的模型客户端；
+3. 把业务能力沉淀为 Tool（如查询天气、查订单、触发流程）；
+4. 在 Controller / ApplicationService 中只做编排，不直接耦合模型 SDK；
+5. 对每个请求统一注入 `sessionId`，保证上下文可追踪。
+   
+---
+
+## 11. EasyCore.Agent.Workflow 详细介绍
+
+`EasyCore.Agent.Workflow` 是在 `EasyCore.Agent` 基础上提供的 **流程编排层**。如果说 `EasyCore.Agent` 解决的是“单个 Agent 怎么用”，那么 Workflow 解决的是“多个步骤/多个 Agent 如何按流程协作”。
+
+### 11.1 适用场景
+
+- 一个用户请求要经过 **意图识别 → 分支处理 → 汇总输出**；
+- 某些节点需要 **并行执行**（例如并行生成 Controller 和 DTO）；
+- 需要保留流程轨迹（Trace）用于调试、审计和性能分析。
+
+### 11.2 基于 AspCoreAgent Demo 的 Workflow 流程讲解
+
+在 `AspCoreAgent` 的 `WorkflowService.RunAsync` 中，流程被组织为：
+
+1. **Step1**：先做意图识别（写入 `intent`）；
+2. **Branch**：根据 `intent` 进入不同分支：
+   - `intent == 1`：代码生成分支（Step2 → Step3/Step4 并行 → Step5）；
+   - `intent == 2`：SQL 生成分支（Step6）；
+   - 其他：普通聊天分支（Step7）；
+3. **Step8**：无论哪个分支，最后统一总结输出。
+
+#### 11.2.1 流程图（Mermaid）
+
+
+```
+ /// <summary>
+ /// 多 Agent 协同，流程执行演示
+ /// </summary>
+ /// <param name="input"></param>
+ /// <param name="cancellationToken"></param>
+ /// <returns></returns>
+ [AITool("get_workflow_test")]
+ [ToolDescription("执行流程")]
+ public async Task<string?> RunAsync([ToolDescription("输入自然整数的数字，例如：1，2。数字的范围上下限是1到2。")] string input, CancellationToken cancellationToken = default)
+ {
+     var workflow = AgentWorkflow.Create()
+         // Step1：意图识别 Agent
+         .AddFunc(Step1Async)
+
+         // 根据 intent 选择不同流程
+         .AddBranch(branch => branch
+
+             // intent == 1：代码生成流程
+             .If(ctx => ctx.Get<string>("intent") == "1", flow => flow
+                 // Step2：计划 Agent
+                 .AddFunc(Step2Async)
+
+                 // Step3 / Step4 并行执行
+                 .AddParallel(parallel => parallel
+                     // Step3：Controller 生成 Agent
+                     .AddFunc(Step3Async)
+
+                     // Step4：DTO 生成 Agent
+                     .AddFunc(Step4Async))
+
+                 // Step5：合并 Agent
+                 .AddFunc(Step5Async))
+
+             // intent == 2：SQL 生成流程
+             .ElseIf(ctx => ctx.Get<string>("intent") == "2", flow => flow
+                 // Step6：SQL Agent
+                 .AddFunc(Step6Async))
+
+             // 兜底流程
+             .Else(flow => flow
+                 // Step7：普通聊天 Agent
+                 .AddFunc(Step7Async)))
+
+         // Step8：最终总结 Agent
+         .AddFunc(Step8Async);
+
+     var context = new AgentWorkflowContext
+     {
+         Input = input
+     };
+
+     await _workflowRunner.RunAsync(workflow, context, cancellationToken);
+
+     return context.Output;
+ }
+
+ /// <summary>
+ /// Step1：意图识别 Agent
+ /// 
+ /// 作用：
+ /// 根据用户输入判断走哪个分支。
+ /// 
+ /// 输入：
+ /// context.Input
+ /// 
+ /// 输出：
+ /// context.Items["intent"]
+ /// </summary>
+ private async Task Step1Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     var input = context.Input?.Trim();
+
+     // 模拟 IntentAgent 的判断结果
+     // 实际项目里，这里可以调用 DeepSeekAgent / OpenAI Agent
+     if (input == "1")
+     {
+         context.Set("intent", "1");
+         context.Set("intent_description", "代码生成流程");
+     }
+     else if (input == "2")
+     {
+         context.Set("intent", "2");
+         context.Set("intent_description", "SQL生成流程");
+     }
+     else
+     {
+         context.Set("intent", "other");
+         context.Set("intent_description", "普通聊天流程");
+     }
+
+     Console.WriteLine($"step1--意图识别结果：{context.Get<string>("intent_description")}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step2：计划 Agent
+ /// 
+ /// 作用：
+ /// 根据用户输入生成代码生成计划。
+ /// 
+ /// 输入：
+ /// context.Input
+ /// 
+ /// 输出：
+ /// context.Items["plan"]
+ /// context.Next(plan)
+ /// </summary>
+ private async Task Step2Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     // 模拟 PlanAgent
+     var plan = $"""
+         【PlanAgent 输出】
+       
+         用户输入：
+         {context.Input}
+       
+         代码生成计划：
+         1. 生成 ProductController
+         2. 生成 ProductDto
+         3. 最后合并 Controller 和 DTO
+         """;
+
+     context.Set("plan", plan);
+
+     // Next 表示：把当前输出作为下一个步骤的输入
+     context.Next(plan);
+
+     Console.WriteLine($"step2--计划生成结果：{plan}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step3：Controller 生成 Agent
+ /// 
+ /// 作用：
+ /// 根据 Step2 的计划生成 Controller。
+ /// 
+ /// 注意：
+ /// 这是并行节点，不要调用 context.Next。
+ /// 并行节点只写自己的结果到 Items。
+ /// 
+ /// 输入：
+ /// context.Items["plan"]
+ /// 
+ /// 输出：
+ /// context.Items["controller"]
+ /// </summary>
+ private async Task Step3Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     var plan = context.Get<string>("plan");
+
+     // 模拟 ControllerAgent
+     var controller = $$"""
+        【ControllerAgent 输出】
+        
+        根据计划生成 Controller：
+        
+        {{plan}}
+        
+        public sealed class ProductController : ControllerBase
+        {
+            [HttpGet("{id}")]
+            public IActionResult Get(Guid id)
+            {
+                return Ok(new ProductDto
+                {
+                    Id = id,
+                    Name = "测试商品"
+                });
+            }
+        }
+        """;
+
+     context.Set("controller", controller);
+
+     Console.WriteLine($"step3--Controller 生成结果：{controller}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step4：DTO 生成 Agent
+ /// 
+ /// 作用：
+ /// 根据 Step2 的计划生成 DTO。
+ /// 
+ /// 注意：
+ /// 这是并行节点，不要调用 context.Next。
+ /// 并行节点只写自己的结果到 Items。
+ /// 
+ /// 输入：
+ /// context.Items["plan"]
+ /// 
+ /// 输出：
+ /// context.Items["dto"]
+ /// </summary>
+ private async Task Step4Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     var plan = context.Get<string>("plan");
+
+     // 模拟 DtoAgent
+     var dto = $$"""
+        【DtoAgent 输出】
+        
+        根据计划生成 DTO：
+        
+        {{plan}}
+        
+        public sealed class ProductDto
+        {
+            public Guid Id { get; set; }
+        
+            public string Name { get; set; } = string.Empty;
+        }
+        """;
+
+     context.Set("dto", dto);
+
+     Console.WriteLine($"step4--DTO 生成结果：{dto}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step5：合并 Agent
+ /// 
+ /// 作用：
+ /// 等 Step3 和 Step4 都执行完之后，读取并行结果并合并。
+ /// 
+ /// 输入：
+ /// context.Items["controller"]
+ /// context.Items["dto"]
+ /// 
+ /// 输出：
+ /// context.Next(result)
+ /// </summary>
+ private async Task Step5Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     var controller = context.Get<string>("controller");
+     var dto = context.Get<string>("dto");
+
+     // 模拟 MergeAgent
+     var result = $"""
+      【MergeAgent 输出】
+   
+      ===== Controller =====
+   
+      {controller}
+   
+      ===== DTO =====
+   
+      {dto}
+   
+      合并说明：
+      Controller 和 DTO 已经生成完成。
+      """;
+
+     // 合并后的结果给后面的 Step8 使用
+     context.Next(result);
+
+     Console.WriteLine($"step5--合并结果：{result}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step6：SQL 生成 Agent
+ /// 
+ /// 作用：
+ /// 当 intent == 2 时，走 SQL 分支。
+ /// 
+ /// 输入：
+ /// context.Input
+ /// 
+ /// 输出：
+ /// context.Next(sqlResult)
+ /// </summary>
+ private async Task Step6Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     // 模拟 SqlAgent
+     var sqlResult = $"""
+        【SqlAgent 输出】
+     
+        用户输入：
+        {context.Input}
+     
+        生成 SQL：
+     
+        SELECT *
+        FROM Products
+        WHERE IsDeleted = 0
+        ORDER BY CreateTime DESC;
+        """;
+
+     context.Set("sql_result", sqlResult);
+
+     context.Next(sqlResult);
+
+     Console.WriteLine($"step6--SQL 生成结果：{sqlResult}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step7：普通聊天 Agent
+ /// 
+ /// 作用：
+ /// 当 intent 不是 1 或 2 时，走普通聊天分支。
+ /// 
+ /// 输入：
+ /// context.Input
+ /// 
+ /// 输出：
+ /// context.Next(answer)
+ /// </summary>
+ private async Task Step7Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     // 模拟 ChatAgent
+     var answer = $"""
+        【ChatAgent 输出】
+     
+        你输入的是：
+        {context.Input}
+     
+        当前没有匹配到代码生成流程或 SQL 生成流程，所以进入普通聊天流程。
+        """;
+
+     context.Next(answer);
+
+     Console.WriteLine($"step7--普通聊天结果：{answer}");
+
+     await Task.CompletedTask;
+ }
+
+ /// <summary>
+ /// Step8：最终总结 Agent
+ /// 
+ /// 作用：
+ /// 所有分支执行完成后，统一做最终输出。
+ /// 
+ /// 输入：
+ /// context.Output
+ /// 
+ /// 输出：
+ /// context.Output
+ /// </summary>
+ private async Task Step8Async(AgentWorkflowContext context, CancellationToken cancellationToken)
+ {
+     var intent = context.Get<string>("intent");
+     var intentDescription = context.Get<string>("intent_description");
+
+     // 模拟 SummaryAgent
+     context.Output = $"""
+        【SummaryAgent 输出】
+      
+        流程执行完成。
+      
+        Intent：
+        {intent}
+      
+        Intent说明：
+        {intentDescription}
+      
+        最终结果：
+      
+        {context.Output}
+        """;
+
+     Console.WriteLine($"step8--最终总结结果：{context.Output}");
+
+     await Task.CompletedTask;
+ }
+```
+
+
+```mermaid
+flowchart TD
+    A[开始: 输入 Input] --> B[Step1 意图识别]
+    B --> C{intent?}
+
+    C -->|1| D[Step2 生成计划]
+    D --> E1[Step3 生成 Controller]
+    D --> E2[Step4 生成 DTO]
+    E1 --> F[Step5 合并结果]
+    E2 --> F
+
+    C -->|2| G[Step6 生成 SQL]
+    C -->|other| H[Step7 普通聊天]
+
+    F --> I[Step8 最终总结]
+    G --> I
+    H --> I
+
+    I --> J[结束: 输出 Output]
+```
+
+#### 11.2.2 执行要点
+
+- **分支前置判定**：Step1 只负责路由，不直接产出最终答案；
+- **并行节点约束**：并行节点（Step3/Step4）建议只写 `Items`，不要相互覆盖 `Output`；
+- **合并节点职责**：Step5 汇总并行结果后再 `Next` 给下游；
+- **统一收口**：Step8 将不同分支输出包装成统一结构，便于前端展示。
+
+### 11.3 EasyCore.Agent.Workflow API 说明（仅名称 + 功能）
+
+> 以下只介绍 API 名称与用途，不绑定到具体类，方便从“能力视角”理解。
+
+#### 11.3.1 流程构建 API
+
+- **Create**：创建一个新的流程定义实例。  
+- **AddFunc**：添加一个普通步骤（支持同步/异步委托重载）。  
+- **AddBranch**：添加条件分支容器。  
+- **AddParallel**：添加并行执行容器。  
+- **RunAsync**：按顺序执行流程定义中的步骤。
+
+#### 11.3.2 分支编排 API
+
+- **If**：定义第一个条件分支。  
+- **ElseIf**：定义后续条件分支。  
+- **Else**：定义兜底分支。
+
+#### 11.3.3 并行编排 API
+
+- **AddFunc**：向并行容器中添加并行步骤。  
+- **AddFlow**：向并行容器中添加一段子流程。  
+- **AddBranch**：向并行容器中添加一个分支子流程。
+
+#### 11.3.4 上下文与数据流 API
+
+- **Set**：将步骤产出写入上下文键值区。  
+- **Get**：按键读取上下文值。  
+- **Get<T>**：按类型安全方式读取上下文值。  
+- **Next**：把当前输出作为下一个步骤输入，同时刷新 `Output`。
+
+#### 11.3.5 运行与接入 API
+
+- **EasyCoreAgentWorkflow**：注册 Workflow 运行能力到依赖注入。  
+- **RunAsync**：通过运行器触发流程执行（通常由应用服务调用）。
+
+#### 11.3.6 轨迹数据字段（用于可观测性）
+
+- **StepName**：步骤名称。  
+- **StepType**：步骤类型（如 Func / Branch / Parallel）。  
+- **StartTime / EndTime**：步骤开始与结束时间。  
+- **ElapsedMilliseconds**：步骤耗时（毫秒）。  
+- **Success**：步骤是否成功。  
+- **ErrorMessage**：失败时的异常信息。
+  
+---
+
+## 12. Demo 运行
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
