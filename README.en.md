@@ -74,7 +74,7 @@ When directly using large model SDKs in business applications, developers often 
 
 ### 4.1 Install Package
 
-Install `EasyCore.Agent` into your solution via NuGet.
+Install EasyCore.Agent into your solution via NuGet.
 
 ### 4.2 Register Services
 

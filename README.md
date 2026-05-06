@@ -101,7 +101,7 @@ sequenceDiagram
 
 ### 4.1 引用项目
 
-将 `src/EasyCore.Agent/EasyCore.Agent/EasyCore.Agent.csproj` 引入你的解决方案。
+通过nuget 将 EasyCore.Agent 引入你的解决方案。
 
 ### 4.2 注册服务
 
