@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37203.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EasyCore.Agent", "EasyCore.Agent", "{91DA91EF-BDA7-431D-AD7D-841F72BFAF2A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyCore.Agent", "src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj", "{BED324D2-CF45-4C8F-97AD-1E29E45C409A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{963D8CE8-920C-40D1-8AC1-02B0B1B2E3BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreAgent", "demo\AspCoreAgent\AspCoreAgent.csproj", "{1AD31288-8480-4915-9FC7-D24643BEEBDD}"
@@ -19,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BED324D2-CF45-4C8F-97AD-1E29E45C409A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BED324D2-CF45-4C8F-97AD-1E29E45C409A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BED324D2-CF45-4C8F-97AD-1E29E45C409A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BED324D2-CF45-4C8F-97AD-1E29E45C409A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1AD31288-8480-4915-9FC7-D24643BEEBDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1AD31288-8480-4915-9FC7-D24643BEEBDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AD31288-8480-4915-9FC7-D24643BEEBDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,8 +22,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{91DA91EF-BDA7-431D-AD7D-841F72BFAF2A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{BED324D2-CF45-4C8F-97AD-1E29E45C409A} = {91DA91EF-BDA7-431D-AD7D-841F72BFAF2A}
 		{1AD31288-8480-4915-9FC7-D24643BEEBDD} = {963D8CE8-920C-40D1-8AC1-02B0B1B2E3BA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

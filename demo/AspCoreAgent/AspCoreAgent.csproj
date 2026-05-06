@@ -11,11 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj" />
+    <PackageReference Include="EasyCore.Dependencie" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EasyCore.Dependencie" Version="8.0.0" />
+    <PackageReference Include="EasyCore.Agent" Version="8.0.0" />
   </ItemGroup>
 
 </Project>
