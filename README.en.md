@@ -647,26 +647,7 @@ private async Task Step8Async(AgentWorkflowContext context, CancellationToken ca
 }
 ```
 
-```mermaid
-flowchart TD
-    A[Start: Input] --> B[Step1 Intent Recognition]
-    B --> C{intent?}
-
-    C -->|1| D[Step2 Generate Plan]
-    D --> E1[Step3 Generate Controller]
-    D --> E2[Step4 Generate DTO]
-    E1 --> F[Step5 Merge Result]
-    E2 --> F
-
-    C -->|2| G[Step6 Generate SQL]
-    C -->|other| H[Step7 Normal Chat]
-
-    F --> I[Step8 Final Summary]
-    G --> I
-    H --> I
-
-    I --> J[End: Output]
-```
+![Workflow Diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/workflow-cn.svg)
 
 #### 11.2.2 Execution Notes
 

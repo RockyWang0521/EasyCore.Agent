@@ -643,27 +643,7 @@ agentClient.ClearChatContext(sessionId);
  }
 ```
 
-
-```mermaid
-flowchart TD
-    A[开始: 输入 Input] --> B[Step1 意图识别]
-    B --> C{intent?}
-
-    C -->|1| D[Step2 生成计划]
-    D --> E1[Step3 生成 Controller]
-    D --> E2[Step4 生成 DTO]
-    E1 --> F[Step5 合并结果]
-    E2 --> F
-
-    C -->|2| G[Step6 生成 SQL]
-    C -->|other| H[Step7 普通聊天]
-
-    F --> I[Step8 最终总结]
-    G --> I
-    H --> I
-
-    I --> J[结束: 输出 Output]
-```
+![流程图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/workflow-cn.svg)
 
 #### 11.2.2 执行要点
 
