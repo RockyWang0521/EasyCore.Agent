@@ -1,5 +1,6 @@
 using AspCoreAgent.Agent;
 using AspCoreAgent.Route;
+using AspCoreAgent.Tools;
 using EasyCore.Agent;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -13,11 +14,13 @@ namespace AspCoreAgent.Controllers
     {
         private readonly DeepSeekAgent _agent;
         private readonly IAIToolProvider _toolProvider;
+        private readonly WorkflowTool _workflowService;
 
-        public AgentController(DeepSeekAgent agent, IAIToolProvider toolProvider)
+        public AgentController(DeepSeekAgent agent, IAIToolProvider toolProvider, WorkflowTool workflowService)
         {
             _agent = agent;
             _toolProvider = toolProvider;
+            _workflowService = workflowService;
         }
 
         [HttpGet]
@@ -127,16 +130,22 @@ namespace AspCoreAgent.Controllers
                 agentRouteDecision = JsonSerializer.Deserialize<AgentRouteDecision>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, Converters = { new JsonStringEnumConverter() } });
             }
 
-            const string agentName2 = "工具调度助手";
-            const string instructions2 = "  你是一个工具调度助手。你的任务：1. 判断用户问题是否需要调用工具。2. 如果需要，选择最合适的工具调用。3. 如果不需要工具，直接回答用户。4. 不要生成项目。5. 不要进入代码生成工作流。6. 最终回答要直接、清楚、可执行。7.严格按照返回值的格式返回结果。";
+            const string agentNameTool = "工具调度助手";
+            const string instructionsTool = "  你是一个工具调度助手。你的任务：1. 判断用户问题是否需要调用工具。2. 如果需要，选择最合适的工具调用。3. 如果不需要工具，直接回答用户。4. 不要生成项目。5. 不要进入代码生成工作流。6. 最终回答要直接、清楚、可执行。7.严格按照返回值的格式返回结果。";
 
             sessionId ??= "default";
 
             var tools = _toolProvider.GetTools(agentRouteDecision!.ToolName!);
 
-            var agent2 = _agent.CreateAgent(agentName2, instructions2, tools);
+            var agentTool = _agent.CreateAgent(agentNameTool, instructionsTool, tools);
 
-            return await _agent.ChatRunAsync(sessionId, agent2, agentRouteDecision.UserQuestion);
+            return await _agent.ChatRunAsync(sessionId, agentTool, agentRouteDecision.UserQuestion);
+        }
+
+        [HttpPost("AgentWorkflow")]
+        public async Task<string?> AgentWorkflow(string message, string? sessionId = null)
+        {
+            return await _workflowService.RunAsync(message);
         }
     }
 }

@@ -647,7 +647,7 @@ private async Task Step8Async(AgentWorkflowContext context, CancellationToken ca
 }
 ```
 
-![Workflow Diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/workflow-cn.svg)
+![Workflow Diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/workflow-en.svg)
 
 #### 11.2.2 Execution Notes
 

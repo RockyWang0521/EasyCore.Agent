@@ -1,6 +1,8 @@
 using AspCoreAgent.Agent;
 using EasyCore.Agent;
+using EasyCore.Agent.Workflow;
 using EasyCore.Dependencie;
+
 
 namespace AspCoreAgent
 {
@@ -28,7 +30,7 @@ namespace AspCoreAgent
                 //options.ConnectTimeout = 100;
                 //options.SyncTimeout = 100;
                 //options.DistributedName = "Web.EasyCore.Cache";
-            });
+            }).EasyCoreAgentWorkflow();
 
             var app = builder.Build();
 
