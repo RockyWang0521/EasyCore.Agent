@@ -66,6 +66,8 @@ When using large model SDKs directly in business systems, you usually run into t
 - 🗄️ **Switchable context storage**: Supports both `Memory` for development and `Redis` for production.
 - 🔌 **OpenAI-compatible integration**: Supports custom `BaseUrl` and `Model`.
 - 🧱 **Clear extension points**: Built on `BasicAgentClient<TOptions>` for easy business-level encapsulation.
+- 🎯 **Precise tool selection** via `GetToolsByNames(...)`, `GetToolsByAuth(...)`, and `GetToolsByNamesAndAuth(...)`.
+- 🧾 **Raw response output** with `AgentResponse` for advanced orchestration/debugging.
 
 ---
 
@@ -133,6 +135,7 @@ var answer = await agentClient.ChatRunAsync(
 | `ApiKey` | Model service API key | `sk-xxxx` |
 | `BaseUrl` | Model service endpoint | `https://api.openai.com/v1` |
 | `Model` | Model name | `gpt-4.1-mini` |
+| `EnvName` | Env var name used when `ApiKey` is empty | `EASYCORE_AGENT_API_KEY` |
 
 ### 5.2 `AgentConfigOptions`
 
@@ -166,26 +169,110 @@ public class WeatherTool
 
 The system scans public instance methods in assemblies under the runtime directory, identifies methods decorated with `[AITool]`, and registers them into `IAIToolProvider`.
 
+### 6.3 `IAIToolProvider` API surface (complete)
+
+- `GetTool(string name, string[]? auth = null)`
+- `GetTools()`
+- `GetToolsByNames(params string[] names)`
+- `GetToolsByAuth(string[]? auth = null)`
+- `GetToolsByNamesAndAuth(string[]? auth = null, params string[] names)`
+
+Example:
+
+```csharp
+var allTools = _toolProvider.GetTools();
+var namedTools = _toolProvider.GetToolsByNames("get_weather", "get_workflow_test");
+var authTools = _toolProvider.GetToolsByAuth(new[] { "order.read", "order.*" });
+var finalTools = _toolProvider.GetToolsByNamesAndAuth(
+    auth: new[] { "order.read" },
+    names: new[] { "get_order", "cancel_order" });
+```
+
+### 6.4 Auth wildcard rules
+
+1. If a tool has no auth requirement, access is allowed.
+2. If a tool requires auth and user auth is empty, access is denied.
+3. No wildcard => case-insensitive exact match.
+4. Global `*` => matches any permission.
+5. Segment wildcard: split by `.`, `*` matches one segment only.
+6. Any-match pass: any user permission matching any required tool permission grants access.
+
 ---
 
 ## 7. API Usage Examples
 
-### 7.1 Multi-turn Conversation with Context
+### 7.1 Multi-turn conversation (with context)
 
 ```csharp
 var answer = await agentClient.ChatRunAsync(sessionId, agent, userInput);
 ```
 
-### 7.2 Single-turn Call without Context
+### 7.2 Single-turn call (no context)
 
 ```csharp
 var answer = await agentClient.ChatRunAsync(agent, "hello");
 ```
 
-### 7.3 Clear Context
+### 7.3 Single-turn call with `ChatMessage` / collection
+
+```csharp
+using Microsoft.Extensions.AI;
+
+var msg = new ChatMessage(ChatRole.User, "Please summarize this content.");
+var answer1 = await agentClient.ChatRunAsync(agent, msg);
+
+var messages = new List<ChatMessage>
+{
+    new(ChatRole.System, "You are a technical documentation assistant."),
+    new(ChatRole.User, "Explain this API.")
+};
+var answer2 = await agentClient.ChatRunAsync(agent, messages);
+```
+
+### 7.4 Return raw `AgentResponse`
+
+```csharp
+var response1 = await agentClient.ChatRunAgentResponseAsync(agent, "hello");
+var response2 = await agentClient.ChatRunAgentResponseAsync(agent, new ChatMessage(ChatRole.User, "hello"));
+var response3 = await agentClient.ChatRunAgentResponseAsync(agent, messages);
+```
+
+### 7.5 Clear context
 
 ```csharp
 agentClient.ClearChatContext(sessionId);
+```
+
+### 7.6 Create named/unnamed agents
+
+```csharp
+var namedAgent = agentClient.CreateAgent("planner", "You are a planning assistant.", tools);
+var defaultAgent = agentClient.CreateAgent("You are a general assistant.", tools);
+```
+
+### 7.7 Inject tools selected by route
+
+```csharp
+var tools = _toolProvider.GetToolsByNames(agentRouteDecision!.ToolName!);
+```
+
+### 7.8 `CreateAgent` overloads
+
+```csharp
+public AIAgent CreateAgent(string agentName, string instructions, IList<AITool>? tools = null);
+public AIAgent CreateAgent(string instructions, IList<AITool>? tools = null);
+```
+
+### 7.9 New overloads for `ChatRunAgentResponseAsync` / `ChatRunAsync`
+
+```csharp
+public Task<AgentResponse> ChatRunAgentResponseAsync(AIAgent agent, string message, CancellationToken cancellationToken = default);
+public Task<AgentResponse> ChatRunAgentResponseAsync(AIAgent agent, ChatMessage message, CancellationToken cancellationToken = default);
+public Task<AgentResponse> ChatRunAgentResponseAsync(AIAgent agent, IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default);
+
+public Task<string> ChatRunAsync(AIAgent agent, string message, CancellationToken cancellationToken = default);
+public Task<string> ChatRunAsync(AIAgent agent, ChatMessage message, CancellationToken cancellationToken = default);
+public Task<string> ChatRunAsync(AIAgent agent, IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default);
 ```
 
 ---
@@ -204,6 +291,8 @@ agentClient.ClearChatContext(sessionId);
 ### ❓ Q1: Why do I get the error `ApiKey/BaseUrl/Model is not configured`?
 
 Make sure the configuration values are not empty and do not contain invisible characters, such as full-width spaces or line breaks.
+
+> If `ApiKey` is not explicitly configured, the SDK reads it from the environment variable specified by `EnvName`.
 
 ### ❓ Q2: Why is my tool not called?
 
