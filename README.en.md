@@ -180,22 +180,34 @@ The system scans public instance methods in assemblies under the runtime directo
 Example:
 
 ```csharp
+// 1) All tools
 var allTools = _toolProvider.GetTools();
+
+// 2) Filter by names (commonly used in routing scenarios)
 var namedTools = _toolProvider.GetToolsByNames("get_weather", "get_workflow_test");
+
+// 3) Filter by authorization
 var authTools = _toolProvider.GetToolsByAuth(new[] { "order.read", "order.*" });
+
+// 4) Combined filter by names and authorization
 var finalTools = _toolProvider.GetToolsByNamesAndAuth(
     auth: new[] { "order.read" },
     names: new[] { "get_order", "cancel_order" });
 ```
 
-### 6.4 Auth wildcard rules
+### 6.4 Permission Wildcard Rules (GetToolsByAuth / GetToolsByNamesAndAuth)
 
-1. If a tool has no auth requirement, access is allowed.
-2. If a tool requires auth and user auth is empty, access is denied.
-3. No wildcard => case-insensitive exact match.
-4. Global `*` => matches any permission.
-5. Segment wildcard: split by `.`, `*` matches one segment only.
-6. Any-match pass: any user permission matching any required tool permission grants access.
+The Tool permission matching rules are as follows:
+
+1. **Tool without configured permissions**: Access is allowed by default.
+2. **Tool with permissions configured, but user auth is empty**: Access is denied.
+3. **No wildcard**: Case-insensitive exact match (e.g., order.read only matches order.read).
+4. **Global wildcard `*`**: Matches any permission.
+5. **Segmented wildcard: Matches segment by segment using `.` as the delimiter; `*` matches only a single segment.
+   - `order.*` matches `order.read`, `order.write`
+   - `order.*` does NOT match `order.center.read` (different number of segments)
+   - `*.read` matches `order.read`, `user.read`
+6. **Any match grants access: If any item in the user's permission set matches any required permission of the Tool, access is allowed.
 
 ---
 
@@ -263,6 +275,12 @@ public AIAgent CreateAgent(string agentName, string instructions, IList<AITool>?
 public AIAgent CreateAgent(string instructions, IList<AITool>? tools = null);
 ```
 
+Description:
+- The first overload is designed for multi-Agent collaboration and observability scenarios (supports explicit configuration of `agentName`).
+- The second overload is intended for simple scenarios (only requires system prompts and tools as input).
+- Both overloads internally read `ApiKey`, `BaseUrl`, and `Model`, then instantiate an executable `AIAgent` with tool capabilities.
+- When `ApiKey` is not configured, it will be retrieved from the environment variable specified by `EnvName` (default: `EASYCORE_AGENT_API_KEY`).
+
 ### 7.9 New overloads for `ChatRunAgentResponseAsync` / `ChatRunAsync`
 
 ```csharp
@@ -274,6 +292,11 @@ public Task<string> ChatRunAsync(AIAgent agent, string message, CancellationToke
 public Task<string> ChatRunAsync(AIAgent agent, ChatMessage message, CancellationToken cancellationToken = default);
 public Task<string> ChatRunAsync(AIAgent agent, IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default);
 ```
+Description:
+
+- `ChatRunAgentResponseAsync` returns the raw `AgentResponse`, suitable for advanced scenarios that require accessing more response details.
+- `ChatRunAsync` returns `response.Text`, ideal for common scenarios where only the text result is needed.
+- The three sets of input parameters respectively support `string`, single `ChatMessage`, and multiple `ChatMessage` (`IEnumerable`).
 
 ---
 
