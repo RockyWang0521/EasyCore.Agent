@@ -1,0 +1,6 @@
+@Demo.EasyCore.Vector.Milvus_HostAddress = http://localhost:5152
+
+GET {{Demo.EasyCore.Vector.Milvus_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

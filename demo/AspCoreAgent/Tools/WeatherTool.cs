@@ -5,6 +5,7 @@ namespace MultiStackSolutionGenerator.Api.Tools
     public class WeatherTool
     {
         [AITool("get_weather")]
+        [ToolAuthorize("weather.read")]
         [ToolDescription("获取天气信息")]
         public async Task<WeatherResult> GetWeatherAsync([ToolDescription("城市名称，例如：北京、上海、广州")] string city)
         {

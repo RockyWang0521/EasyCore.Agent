@@ -2,7 +2,12 @@ using AspCoreAgent.Agent;
 using AspCoreAgent.Route;
 using AspCoreAgent.Tools;
 using EasyCore.Agent;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.AI;
+using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime.Tensors;
+using OpenCvSharp;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -14,13 +19,13 @@ namespace AspCoreAgent.Controllers
     {
         private readonly DeepSeekAgent _agent;
         private readonly IAIToolProvider _toolProvider;
-        private readonly WorkflowTool _workflowService;
+        private readonly PipelineTool _pipelineTool;
 
-        public AgentController(DeepSeekAgent agent, IAIToolProvider toolProvider, WorkflowTool workflowService)
+        public AgentController(DeepSeekAgent agent, IAIToolProvider toolProvider, PipelineTool pipelineTool)
         {
             _agent = agent;
             _toolProvider = toolProvider;
-            _workflowService = workflowService;
+            _pipelineTool = pipelineTool;
         }
 
         [HttpGet("Get")]
@@ -45,6 +50,21 @@ namespace AspCoreAgent.Controllers
             sessionId ??= "default";
 
             var tools = _toolProvider.GetToolsByNames("get_weather");
+
+            var agent = _agent.CreateAgent(agentName, instructions, tools);
+
+            return await _agent.ChatRunAsync(sessionId, agent, message);
+        }
+
+        [HttpPost("ReAct")]
+        public async Task<string> ReAct(string message, string? sessionId = null)
+        {
+            const string agentName = "工具调度助手和普通聊天助手";
+            const string instructions = "  你是一个工具调度助手和普通聊天助手。你的任务：1. 判断用户问题是否需要调用工具。2. 如果需要，选择最合适的工具调用。3. 如果不需要工具，直接回答用户。4. 不要生成项目。5. 不要进入代码生成工作流。6. 最终回答要直接、清楚、可执行。7.严格按照返回值的格式返回结果。";
+
+            sessionId ??= "default";
+
+            var tools = _toolProvider.GetTools();
 
             var agent = _agent.CreateAgent(agentName, instructions, tools);
 
@@ -160,10 +180,194 @@ namespace AspCoreAgent.Controllers
             return await _agent.ChatRunAsync(sessionId, agentTool, agentRouteDecision.UserQuestion);
         }
 
-        [HttpPost("AgentWorkflow")]
-        public async Task<string?> AgentWorkflow(string message, string? sessionId = null)
+        [HttpPost("AgentPipeline")]
+        public async Task<string?> AgentPipeline(string message, string? sessionId = null)
         {
-            return await _workflowService.RunAsync(message);
+            return await _pipelineTool.RunAsync(message);
+        }
+
+        [HttpPost("ChatWithImage")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ChatWithImage(
+            [FromForm] ChatWithImageRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (request.Image == null || request.Image.Length == 0)
+                return BadRequest("请上传图片");
+
+            await using var stream = request.Image.OpenReadStream();
+
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream, cancellationToken);
+
+            var imageBytes = memoryStream.ToArray();
+
+            using var mat = Cv2.ImDecode(imageBytes, ImreadModes.Color);
+
+            if (mat.Empty())
+                return BadRequest("图片解析失败");
+
+            var width = mat.Width;
+            var height = mat.Height;
+
+            var instructions = BuildTireDamagePrompt(width, height);
+
+            var agent = _agent.CreateAgent("图片聊天助手", instructions);
+
+            var chatMessage = new ChatMessage(ChatRole.User,
+            [
+                new TextContent(request.Message),
+                new DataContent(imageBytes, GetImageMimeType(request.Image.FileName))
+            ]);
+
+            var json = await _agent.ChatRunAsync(agent, chatMessage, cancellationToken: cancellationToken);
+
+            var result = JsonSerializer.Deserialize<TireDamageResult>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (result == null)
+                return BadRequest($"模型返回 JSON 格式错误：{json}");
+
+            if (result.HasDamage && result.Damages.Count > 0)
+            {
+                foreach (var damage in result.Damages)
+                {
+                    var box = damage.Box;
+
+                    var x1 = Math.Clamp(box.X1, 0, width - 1);
+                    var y1 = Math.Clamp(box.Y1, 0, height - 1);
+                    var x2 = Math.Clamp(box.X2, 0, width - 1);
+                    var y2 = Math.Clamp(box.Y2, 0, height - 1);
+
+                    Console.WriteLine($"Image: {mat.Width}x{mat.Height}");
+                    Console.WriteLine($"Box: x1={x1}, y1={y1}, x2={x2}, y2={y2}");
+
+                    if (x2 <= x1 || y2 <= y1)
+                        continue;
+
+                    Cv2.Rectangle(
+                        mat,
+                        new Rect(x1, y1, x2 - x1, y2 - y1),
+                        new Scalar(0, 0, 255),
+                        thickness: 3);
+
+                    var label = $"{damage.Type} {damage.Confidence:0.00}";
+
+                    Cv2.PutText(
+                        mat,
+                        label,
+                        new Point(x1, Math.Max(y1 - 8, 20)),
+                        HersheyFonts.HersheySimplex,
+                        0.7,
+                        new Scalar(0, 0, 255),
+                        thickness: 2);
+                }
+            }
+
+            Cv2.ImEncode(".jpg", mat, out var outputBytes);
+
+            return File(
+                outputBytes,
+                "image/jpeg",
+                $"marked_{DateTime.Now:yyyyMMddHHmmss}.jpg");
+        }
+
+        private static string GetImageMimeType(string fileName)
+        {
+            return Path.GetExtension(fileName).ToLowerInvariant() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+        }
+
+        private static string BuildTireDamagePrompt(int width, int height)
+        {
+            return $$"""
+你是专业的轮胎破损检测助手。
+
+输入图像尺寸：
+- width = {{width}}
+- height = {{height}}
+
+你的任务是：
+仅检测轮胎表面的“真实物理破损”。
+
+允许检测的破损类型仅包括：
+- crack（裂纹）
+- scratch（划伤）
+- hole（孔洞）
+- unknown（无法明确分类）
+
+必须严格忽略以下内容：
+- 轮胎正常花纹沟
+- 胎面纹理
+- 胎侧橡胶纹路
+- 阴影
+- 灰尘
+- 污渍
+- 反光
+- 橡胶老化痕迹
+- 普通磨损
+- 图像噪点
+- 拍摄伪影
+
+重要规则：
+
+1. 只有当区域明显区别于正常花纹结构时，才允许判定为破损。
+
+2. 若无法确定是真实破损，必须返回：
+{
+  "hasDamage": false,
+  "damages": []
+}
+
+3. 不允许猜测性检测。
+
+4. 不允许把连续规则花纹沟识别为 crack。
+
+5. bounding box 必须紧贴真实破损区域，不得过大。
+
+6. box 坐标必须满足：
+- x 范围：0~{{width}}
+- y 范围：0~{{height}}
+- x1 < x2
+- y1 < y2
+
+7. confidence 规则：
+- 真实明显破损：0.90~1.00
+- 不允许输出 confidence < 0.90 的破损
+
+8. 输出必须是纯 JSON：
+- 不允许 markdown
+- 不允许解释
+- 不允许代码块
+- 不允许额外文字
+
+输出格式：
+{
+  "hasDamage": true,
+  "damages": [
+    {
+      "type": "crack",
+      "confidence": 0.95,
+      "box": {
+        "x1": 120,
+        "y1": 80,
+        "x2": 168,
+        "y2": 122
+      }
+    }
+  ]
+}
+""";
         }
     }
 }

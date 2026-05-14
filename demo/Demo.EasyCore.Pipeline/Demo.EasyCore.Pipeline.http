@@ -1,0 +1,6 @@
+@Demo.EasyCore.Pipeline_HostAddress = http://localhost:5189
+
+GET {{Demo.EasyCore.Pipeline_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

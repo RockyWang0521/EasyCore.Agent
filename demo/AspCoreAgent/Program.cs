@@ -1,8 +1,12 @@
 using AspCoreAgent.Agent;
 using EasyCore.Agent;
-using EasyCore.Agent.Workflow;
 using EasyCore.Dependencie;
-
+using EasyCore.Vector.Qdrant;
+using EasyCore.Vector.PostgreSQL;
+using EasyCore.Vector.Milvus;
+using EasyCore.Vector.Redis;
+using EasyCore.Vector.Elasticsearch;
+using EasyCore.Workflow;
 
 namespace AspCoreAgent
 {
@@ -20,17 +24,65 @@ namespace AspCoreAgent
             builder.Services.AddSwaggerGen();
 
             builder.Services.Configure<DeepSeekClientOptions>(builder.Configuration.GetSection(DeepSeekClientOptions.SectionName));
+            builder.Services.Configure<QianwenClientOptions>(builder.Configuration.GetSection(QianwenClientOptions.SectionName));
+
             builder.Services.EasyCoreDependencie();
+
+            builder.Services.AddSingleton<YoloOnnxDetector>(sp =>
+            {
+                var modelPath = Path.Combine(AppContext.BaseDirectory, "Onnx", "best.onnx");
+
+                if (!File.Exists(modelPath))
+                    throw new FileNotFoundException("ONNX ????????", modelPath);
+
+                return new YoloOnnxDetector(modelPath);
+            });
+
+            //builder.Services.EasyCoreAgent();
 
             builder.Services.EasyCoreAgent(options =>
             {
-                //options.MaxContextCount = 20;
-                //options.AgentContextStoreType = AgentContextStoreType.Redis;
-                //options.EndPoints = new List<string> { "127.0.0.1:6379" };
-                //options.ConnectTimeout = 100;
-                //options.SyncTimeout = 100;
-                //options.DistributedName = "Web.EasyCore.Cache";
-            }).EasyCoreAgentWorkflow();
+                options.AgentContextStoreType = AgentContextStoreType.Redis;
+                options.EndPoints= new List<string> { "localhost:6379" };
+            });
+
+            builder.Services.EasyCoreMilvus(options =>
+            {
+                options.Host = "localhost";
+                options.Port = 19530;
+                options.DatabaseName = "default";
+                options.UserName = "";
+                options.Password = "";
+                options.UseTls = false;
+            });
+
+            builder.Services.EasyCoreQdrant(options =>
+            {
+                options.Host = "localhost";
+                options.GrpcPort = 6334;
+            });
+
+            builder.Services.EasyCorePostgreSql(options =>
+            {
+                options.ConnectionString = "Host=localhost;Port=5432;Database=vector_db;Username=postgres;Password=Q123456;";
+            });
+
+            builder.Services.EasyCoreRedis(options =>
+            {
+                options.ConnectionString = "localhost:6379";
+            });
+
+            builder.Services.EasyCoreElasticsearch(options =>
+            {
+                options.Url = "http://localhost:9200";
+            });
+
+            builder.Services.EasyCoreWorkflow(options =>
+            {
+                options.StateStoreType = WorkflowStateStoreType.Memory;
+            });
+
+            builder.Services.AddHostedService<AspCoreAgent.Workflow.WorkflowDemoHostedService>();
 
             var app = builder.Build();
 

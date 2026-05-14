@@ -1,0 +1,6 @@
+@Demo.EasyCore.Vector.Elasticsearch_HostAddress = http://localhost:5047
+
+GET {{Demo.EasyCore.Vector.Elasticsearch_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EasyCore.Agent.Workflow" Version="8.0.2" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.26.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.26.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260427" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260302" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
@@ -16,7 +19,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EasyCore.Agent" Version="8.0.3" />
+    <ProjectReference Include="..\..\src\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Pipeline\EasyCore.Pipeline.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Vector.Milvus\EasyCore.Vector.Milvus.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Vector.Qdrant\EasyCore.Vector.Qdrant.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Vector.PostgreSQL\EasyCore.Vector.PostgreSQL.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Vector.Redis\EasyCore.Vector.Redis.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Vector.Elasticsearch\EasyCore.Vector.Elasticsearch.csproj" />
+    <ProjectReference Include="..\..\src\EasyCore.Workflow\EasyCore.Workflow.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Onnx\best.onnx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\results\" />
   </ItemGroup>
 
 </Project>
