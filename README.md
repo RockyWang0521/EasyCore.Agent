@@ -168,6 +168,49 @@ public class WeatherTool
 
 系统会扫描运行目录程序集中的 `public` 实例方法，识别 `[AITool]` 并注册到 `IAIToolProvider`。
 
+### 6.3 `IAIToolProvider` 能力说明（完整）
+
+`IAIToolProvider` 提供以下方法：
+
+- `GetTool(string name, string[]? auth = null)`：按工具名获取单个 Tool（可带权限过滤）。
+- `GetTools()`：获取全部已注册 Tool。
+- `GetToolsByNames(params string[] names)`：按名称白名单批量获取 Tool。
+- `GetToolsByAuth(string[]? auth = null)`：按权限批量获取当前用户可访问 Tool。
+- `GetToolsByNamesAndAuth(string[]? auth = null, params string[] names)`：先按名称过滤，再按权限过滤。
+
+示例：
+
+```csharp
+// 1) 全量工具
+var allTools = _toolProvider.GetTools();
+
+// 2) 按名称筛选（路由场景常用）
+var namedTools = _toolProvider.GetToolsByNames("get_weather", "get_workflow_test");
+
+// 3) 按权限筛选
+var authTools = _toolProvider.GetToolsByAuth(new[] { "order.read", "order.*" });
+
+// 4) 名称 + 权限联合筛选
+var finalTools = _toolProvider.GetToolsByNamesAndAuth(
+    auth: new[] { "order.read" },
+    names: new[] { "get_order", "cancel_order" });
+```
+
+### 6.4 权限通配符规则（`GetToolsByAuth` / `GetToolsByNamesAndAuth`）
+
+Tool 权限匹配规则如下：
+
+1. **Tool 未配置权限**：默认允许访问。  
+2. **Tool 配置了权限，但用户 `auth` 为空**：拒绝访问。  
+3. **无通配符**：大小写不敏感的精确匹配（如 `order.read` 仅匹配 `order.read`）。  
+4. **全局通配符 `*`**：匹配任意权限。  
+5. **分段通配符**：按 `.` 分段后逐段匹配，`*` 只匹配单段。  
+   - `order.*` 可匹配 `order.read`、`order.write`  
+   - `order.*` **不匹配** `order.center.read`（段数不同）  
+   - `*.read` 可匹配 `order.read`、`user.read`  
+6. **任意命中即通过**：用户权限集合中任意一项命中 Tool 需要的任意权限，即允许访问。
+
+
 ---
 
 ## 7. API 使用示例
