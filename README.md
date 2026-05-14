@@ -65,6 +65,8 @@
 - 🗄️ **可切换上下文存储**：`Memory`（开发）与 `Redis`（生产）双模式。
 - 🔌 **OpenAI 兼容接入**：支持自定义 `BaseUrl` 与 `Model`。
 - 🧱 **清晰扩展点**：基于 `BasicAgentClient<TOptions>` 便于业务封装。
+- 🎯 **按名称精确选择 Tool**：支持通过 `GetToolsByNames(...)`,`GetToolsByAuth(...)`,`GetToolsByNamesAndAuth(...)` 精确注入当前回合所需工具。
+- 🧾 **响应对象直出**：支持直接返回 `AgentResponse`，满足高级编排与调试场景。
 
 ---
 
@@ -132,6 +134,7 @@ var answer = await agentClient.ChatRunAsync(
 | `ApiKey` | 模型服务密钥 | `sk-xxxx` |
 | `BaseUrl` | 模型服务地址 | `https://api.openai.com/v1` |
 | `Model` | 模型名称 | `gpt-4.1-mini` |
+| `EnvName` | 当 `ApiKey` 未配置时读取的环境变量名 | `EASYCORE_AGENT_API_KEY` |
 
 ### 5.2 `AgentConfigOptions`
 
@@ -180,12 +183,95 @@ var answer = await agentClient.ChatRunAsync(sessionId, agent, userInput);
 ```csharp
 var answer = await agentClient.ChatRunAsync(agent, "hello");
 ```
+### 7.3 单轮调用（支持 ChatMessage / Messages）
 
-### 7.3 清空上下文
+```csharp
+using Microsoft.Extensions.AI;
+
+var msg = new ChatMessage(ChatRole.User, "请总结这段内容");
+var answer1 = await agentClient.ChatRunAsync(agent, msg);
+
+var messages = new List<ChatMessage>
+{
+    new(ChatRole.System, "你是技术文档助手"),
+    new(ChatRole.User, "解释一下这个接口")
+};
+var answer2 = await agentClient.ChatRunAsync(agent, messages);
+```
+
+### 7.4 返回原始 AgentResponse（便于高级场景）
+
+```csharp
+var response1 = await agentClient.ChatRunAgentResponseAsync(agent, "hello");
+var response2 = await agentClient.ChatRunAgentResponseAsync(agent, new ChatMessage(ChatRole.User, "你好"));
+var response3 = await agentClient.ChatRunAgentResponseAsync(agent, messages);
+
+var text = response1.Text;
+```
+
+### 7.5 清空上下文
 
 ```csharp
 agentClient.ClearChatContext(sessionId);
 ```
+### 7.6 创建 Agent（支持命名与匿名）
+
+```csharp
+// 具名 Agent（便于日志与多 Agent 协同场景）
+var namedAgent = agentClient.CreateAgent(
+    agentName: "planner",
+    instructions: "你是一个计划助手",
+    tools: tools);
+
+// 匿名 Agent（简单场景）
+var defaultAgent = agentClient.CreateAgent(
+    instructions: "你是一个通用助手",
+    tools: tools);
+```
+
+### 7.7 按名称选择工具后注入 Agent
+
+```csharp
+var tools = _toolProvider.GetToolsByNames(agentRouteDecision!.ToolName!);
+
+var agent = agentClient.CreateAgent(
+    agentName: "router-agent",
+    instructions: "根据路由决策调用工具",
+    tools: tools);
+```
+
+### 7.8 CreateAgent 重载（对应新增能力）
+
+```csharp
+public AIAgent CreateAgent(string agentName, string instructions, IList<AITool>? tools = null);
+public AIAgent CreateAgent(string instructions, IList<AITool>? tools = null);
+```
+
+说明：
+
+- 第一个重载适合多 Agent 协同/可观测性场景（可显式设置 `agentName`）。
+- 第二个重载适合简单场景（只给系统指令和工具）。
+- 两个重载内部都会读取 `ApiKey`、`BaseUrl`、`Model`，并创建可调用 Tool 的 `AIAgent`。
+- `ApiKey` 未设置时，会按 `EnvName` 指定的环境变量读取（默认 `EASYCORE_AGENT_API_KEY`）。
+
+### 7.9 ChatRunAgentResponseAsync / ChatRunAsync 新增重载（对应新增能力）
+
+```csharp
+public Task<AgentResponse> ChatRunAgentResponseAsync(AIAgent agent, string message, CancellationToken cancellationToken = default);
+public Task<AgentResponse> ChatRunAgentResponseAsync(AIAgent agent, ChatMessage message, CancellationToken cancellationToken = default);
+public Task<AgentResponse> ChatRunAgentResponseAsync(AIAgent agent, IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default);
+
+public Task<string> ChatRunAsync(AIAgent agent, string message, CancellationToken cancellationToken = default);
+public Task<string> ChatRunAsync(AIAgent agent, ChatMessage message, CancellationToken cancellationToken = default);
+public Task<string> ChatRunAsync(AIAgent agent, IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default);
+```
+
+说明：
+
+- `ChatRunAgentResponseAsync` 返回原始 `AgentResponse`，适合需要读取更多响应信息的高级场景。
+- `ChatRunAsync` 返回 `response.Text`，适合只关心文本结果的常规场景。
+- 三组入参分别支持 `string`、单条 `ChatMessage`、多条 `ChatMessage`（`IEnumerable`）。
+
 
 ---
 
@@ -202,6 +288,7 @@ agentClient.ClearChatContext(sessionId);
 
 ### ❓ Q1：`ApiKey/BaseUrl/Model is not configured` 报错？
 请确认配置非空，且不要包含不可见字符（如全角空格、换行）。
+补充：当 `ApiKey` 未显式配置时，SDK 会自动尝试从 `EnvName` 指定的环境变量中读取（默认 `EASYCORE_AGENT_API_KEY`）。
 
 ### ❓ Q2：工具为什么没有被调用？
 请检查：
