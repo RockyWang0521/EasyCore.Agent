@@ -23,7 +23,7 @@ namespace AspCoreAgent.Controllers
             _workflowService = workflowService;
         }
 
-        [HttpGet]
+        [HttpGet("Get")]
         public async Task<string> Get(string message, string? sessionId = null)
         {
             const string agentName = "普通聊天助手";
@@ -36,7 +36,7 @@ namespace AspCoreAgent.Controllers
             return await _agent.ChatRunAsync(sessionId, agent, message);
         }
 
-        [HttpPost]
+        [HttpPost("Post")]
         public async Task<string> AiTool(string message, string? sessionId = null)
         {
             const string agentName = "工具调度助手";
@@ -44,7 +44,25 @@ namespace AspCoreAgent.Controllers
 
             sessionId ??= "default";
 
-            var tools = _toolProvider.GetTools("get_weather");
+            var tools = _toolProvider.GetToolsByNames("get_weather");
+
+            var agent = _agent.CreateAgent(agentName, instructions, tools);
+
+            return await _agent.ChatRunAsync(sessionId, agent, message);
+        }
+
+        [HttpPost]
+        public async Task<string> AiToolAuth(string message, string? sessionId = null)
+        {
+            const string agentName = "工具调度助手";
+            const string instructions = "  你是一个工具调度助手。你的任务：1. 判断用户问题是否需要调用工具。2. 如果需要，选择最合适的工具调用。3. 如果不需要工具，直接回答用户。4. 不要生成项目。5. 不要进入代码生成工作流。6. 最终回答要直接、清楚、可执行。7.严格按照返回值的格式返回结果。";
+
+            sessionId ??= "default";
+
+            // 读取数据库或者本地，从用户权限表中或者角色表中查询用户或角色具有的权限，例如 weather.read、work.read、work.insert、knowledge.read 等等。
+            var auth = new[] { "weather.read" };
+
+            var tools = _toolProvider.GetToolsByNamesAndAuth(auth, "get_weather");
 
             var agent = _agent.CreateAgent(agentName, instructions, tools);
 
@@ -135,7 +153,7 @@ namespace AspCoreAgent.Controllers
 
             sessionId ??= "default";
 
-            var tools = _toolProvider.GetTools(agentRouteDecision!.ToolName!);
+            var tools = _toolProvider.GetToolsByNames(agentRouteDecision!.ToolName!);
 
             var agentTool = _agent.CreateAgent(agentNameTool, instructionsTool, tools);
 
