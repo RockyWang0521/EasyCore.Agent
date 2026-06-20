@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Demo.Common\Demo.Common.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj" />
   </ItemGroup>
 
 </Project>

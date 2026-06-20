@@ -51,7 +51,7 @@ EasyCore.Agent → EasyCore.Agent.RAG → EasyCore.Vector.*
 
 ## 2. 架构图
 
-![2-架构图](docs/svg/2-架构图-ef6518fd.svg)
+![2-架构图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-架构图-ef6518fd.svg)
 
 
 ---
@@ -260,7 +260,7 @@ Milvus 写入后数据在 growing segment，检索前需 Load 到内存。
 | `LoadAsync(collectionName)` | 将 Collection 加载到 Query Node 内存 |
 | `ReleaseAsync(collectionName)` | 从内存释放 Collection |
 
-![9-milvus-生命周期管理](docs/svg/9-milvus-生命周期管理-0e62eac8.svg)
+![9-milvus-生命周期管理](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/9-milvus-生命周期管理-0e62eac8.svg)
 
 
 > 向量检索内部会自动调用 `LoadAsync`；大批量写入后建议显式 `FlushAsync`。

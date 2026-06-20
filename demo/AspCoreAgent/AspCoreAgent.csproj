@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EasyCore.Agent" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Agent.RAG" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Pipeline" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Vector.Elasticsearch" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Vector.Milvus" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Vector.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Vector.Qdrant" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Vector.Redis" Version="8.0.4" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.26.0" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.26.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260427" />

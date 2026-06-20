@@ -7,14 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EasyCore.Agent.RAG" Version="8.0.4" />
+    <PackageReference Include="EasyCore.Vector.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Demo.Common\Demo.Common.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Vector.PostgreSQL\EasyCore.Vector.PostgreSQL.csproj" />
   </ItemGroup>
 
 </Project>

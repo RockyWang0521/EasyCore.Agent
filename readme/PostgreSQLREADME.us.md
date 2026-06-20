@@ -69,12 +69,12 @@ It shares the same API style as other vector backends (Redis, Qdrant, Milvus, El
 
 ### 2.1 Component Diagram
 
-![2-1-component-diagram](docs/svg/2-1-component-diagram-57c46610.svg)
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-57c46610.svg)
 
 
 ### 2.2 Vector Search Sequence
 
-![2-2-vector-search-sequence](docs/svg/2-2-vector-search-sequence-49b0592d.svg)
+![2-2-vector-search-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-vector-search-sequence-49b0592d.svg)
 
 
 ### 2.3 Storage Model
@@ -198,12 +198,6 @@ docker exec -it pgvector psql -U postgres -d vector_db -c "SELECT extname, extve
 
 ```bash
 dotnet add package EasyCore.Vector.PostgreSQL
-```
-
-Or reference the project directly:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.PostgreSQL\EasyCore.Vector.PostgreSQL.csproj" />
 ```
 
 ### 5.2 Register Services

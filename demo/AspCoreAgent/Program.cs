@@ -6,7 +6,6 @@ using EasyCore.Vector.PostgreSQL;
 using EasyCore.Vector.Milvus;
 using EasyCore.Vector.Redis;
 using EasyCore.Vector.Elasticsearch;
-using EasyCore.Workflow;
 
 namespace AspCoreAgent
 {
@@ -59,11 +58,6 @@ namespace AspCoreAgent
             builder.Services.EasyCoreElasticsearch(options =>
             {
                 options.Url = "http://localhost:9200";
-            });
-
-            builder.Services.EasyCoreWorkflow(options =>
-            {
-                options.StateStoreType = WorkflowStateStoreType.Memory;
             });
 
             var app = builder.Build();

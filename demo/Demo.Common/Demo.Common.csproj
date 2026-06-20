@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EasyCore.Agent" Version="8.0.4" />
     <PackageReference Include="EasyCore.Dependencie" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj" />
   </ItemGroup>
 
 </Project>

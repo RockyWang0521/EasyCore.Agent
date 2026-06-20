@@ -69,12 +69,12 @@ EasyCore.Agent（Agent SDK）
 
 ### 2.1 组件关系图
 
-![2-1-组件关系图](docs/svg/2-1-组件关系图-5d67ae37.svg)
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-5d67ae37.svg)
 
 
 ### 2.2 一次向量检索时序
 
-![2-2-一次向量检索时序](docs/svg/2-2-一次向量检索时序-a3c2fa45.svg)
+![2-2-一次向量检索时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-一次向量检索时序-a3c2fa45.svg)
 
 
 ### 2.3 存储模型
@@ -143,12 +143,6 @@ docker run -d --name elasticsearch \
 
 ```bash
 dotnet add package EasyCore.Vector.Elasticsearch
-```
-
-或在解决方案中直接引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Elasticsearch\EasyCore.Vector.Elasticsearch.csproj" />
 ```
 
 ### 5.2 注册服务
