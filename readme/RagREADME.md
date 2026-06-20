@@ -70,7 +70,7 @@ EasyCore.Agent（Agent SDK / Embedding / 会话上下文）
 
 ### 2.1 RAG 链路总览
 
-![2-1-rag-链路总览](docs/svg/2-1-rag-链路总览-7d4e369a.svg)
+![2-1-rag-链路总览](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-rag-链路总览-7d4e369a.svg)
 
 
 ### 2.2 各模块职责
@@ -84,7 +84,7 @@ EasyCore.Agent（Agent SDK / Embedding / 会话上下文）
 
 ### 2.3 Query Rewrite 时序
 
-![2-3-query-rewrite-时序](docs/svg/2-3-query-rewrite-时序-db16607d.svg)
+![2-3-query-rewrite-时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-3-query-rewrite-时序-db16607d.svg)
 
 
 ---
@@ -129,12 +129,6 @@ EasyCore.Agent（Agent SDK / Embedding / 会话上下文）
 
 ```bash
 dotnet add package EasyCore.Agent.RAG
-```
-
-或引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
 ```
 
 ### 5.2 文档切块
@@ -421,7 +415,7 @@ var userPrompt = MultiQueryPromptBuilder.BuildUserPrompt(query, count: 5);
 
 ## 8. 完整 RAG 流水线
 
-![8-完整-rag-流水线](docs/svg/8-完整-rag-流水线-d3fe635b.svg)
+![8-完整-rag-流水线](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/8-完整-rag-流水线-d3fe635b.svg)
 
 
 **推荐组合：**

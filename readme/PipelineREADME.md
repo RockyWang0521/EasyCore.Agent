@@ -67,12 +67,12 @@ EasyCore.Agent（Agent SDK / Tool Calling / 会话上下文）
 
 ### 2.1 组件关系图
 
-![2-1-组件关系图](docs/svg/2-1-组件关系图-405637b9.svg)
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-405637b9.svg)
 
 
 ### 2.2 一次 Pipeline 执行时序
 
-![2-2-一次-pipeline-执行时序](docs/svg/2-2-一次-pipeline-执行时序-5789ca41.svg)
+![2-2-一次-pipeline-执行时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-一次-pipeline-执行时序-5789ca41.svg)
 
 
 ### 2.3 分支 + 并行流程图（Demo 场景）
@@ -124,13 +124,7 @@ Step8 最终总结
 
 ## 5. 快速开始
 
-### 5.1 引用项目
-
-```bash
-dotnet add reference ../EasyCore.Pipeline/EasyCore.Pipeline.csproj
-```
-
-或安装 NuGet 包（若已发布）：
+### 5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Pipeline

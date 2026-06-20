@@ -81,12 +81,12 @@ EasyCore.Agent（Agent SDK）
 
 ### 2.1 组件关系图
 
-![2-1-组件关系图](docs/svg/2-1-组件关系图-33cf79de.svg)
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-33cf79de.svg)
 
 
 ### 2.2 混合检索时序（Dense + Sparse）
 
-![2-2-混合检索时序-dense-sparse](docs/svg/2-2-混合检索时序-dense-sparse-840ad150.svg)
+![2-2-混合检索时序-dense-sparse](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-混合检索时序-dense-sparse-840ad150.svg)
 
 
 ### 2.3 存储模型
@@ -151,12 +151,6 @@ docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 ```bash
 dotnet add package EasyCore.Vector.Qdrant
-```
-
-或在解决方案中直接引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Qdrant\EasyCore.Vector.Qdrant.csproj" />
 ```
 
 ### 5.2 注册服务

@@ -69,12 +69,12 @@ It shares the same API style as other vector backends (Redis, Qdrant, Milvus, Po
 
 ### 2.1 Component Diagram
 
-![2-1-component-diagram](docs/svg/2-1-component-diagram-50381ee1.svg)
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-50381ee1.svg)
 
 
 ### 2.2 Vector Search Sequence
 
-![2-2-vector-search-sequence](docs/svg/2-2-vector-search-sequence-07298f97.svg)
+![2-2-vector-search-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-vector-search-sequence-07298f97.svg)
 
 
 ### 2.3 Storage Model
@@ -143,12 +143,6 @@ docker run -d --name elasticsearch \
 
 ```bash
 dotnet add package EasyCore.Vector.Elasticsearch
-```
-
-Or reference the project directly:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Elasticsearch\EasyCore.Vector.Elasticsearch.csproj" />
 ```
 
 ### 5.2 Register Services

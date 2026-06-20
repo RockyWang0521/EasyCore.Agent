@@ -87,57 +87,19 @@ Agent layer: Tool Calling + session Memory + Pipeline orchestration
 
 ### 2.1 Component Diagram
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core Application"]
-        API["Controllers / Services"]
-        Tools["AITool business tools"]
-    end
+![diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/diagram-01-cfbf25d6.svg)
 
-    subgraph Agent["EasyCore.Agent"]
-        Client["BasicAgentClient"]
-        CtxStore["IAgentContextStore"]
-        ToolProv["IAIToolProvider"]
-    end
-
-    subgraph RAG["EasyCore.Agent.RAG"]
-        Chunk["DocumentChunker"]
-        Rewrite["QueryRewrite"]
-        MultiQ["MultiQueryGenerator"]
-        MMR["MmrSelector"]
-    end
-
-    subgraph Orch["Orchestration"]
-        Pipe["EasyCore.Pipeline"]
-    end
-
-    subgraph Vector["EasyCore.Vector.*"]
-        Redis["Redis"]
-        Qdrant["Qdrant"]
-        Milvus["Milvus"]
-        PG["PostgreSQL"]
-        ES["Elasticsearch"]
-    end
-
-    API --> Client
-    API --> Tools
-    Tools --> ToolProv
-    Client --> CtxStore
-    API --> Chunk
-    API --> Rewrite
-    API --> MultiQ
-    API --> MMR
-    API --> Pipe
-    API --> Redis
-    API --> Qdrant
-    API --> Milvus
-    API --> PG
-    API --> ES
-```
 
 ### 2.2 RAG Q&A Sequence
 
-See Chinese README §2.2 or submodule RAG documentation for the full sequence diagram.
+![diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/diagram-02-178b751a.svg)
+
+
+### 2.3 Architecture SVG (Legacy Diagrams)
+
+![architecture-en](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/architecture-en.svg)
+
+![sequence-en](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/sequence-en.svg)
 
 ---
 
@@ -146,13 +108,13 @@ See Chinese README §2.2 or submodule RAG documentation for the full sequence di
 | Project | Path | Chinese Doc | English Doc |
 |---|---|---|---|
 | EasyCore.Agent | `src/EasyCore.Agent/EasyCore.Agent` | [README.md](README.md) | This doc §5 |
-| EasyCore.Agent.RAG | `src/EasyCore.Agent.RAG` | [README.md](src/EasyCore.Agent.RAG/README.md) | This doc §6 |
-| EasyCore.Pipeline | `src/EasyCore.Pipeline` | [README.md](src/EasyCore.Pipeline/README.md) | This doc §7 |
-| EasyCore.Vector.Redis | `src/EasyCore.Vector.Redis` | [README.md](src/EasyCore.Vector.Redis/README.md) | This doc §8 |
-| EasyCore.Vector.Qdrant | `src/EasyCore.Vector.Qdrant` | [README.md](src/EasyCore.Vector.Qdrant/README.md) | This doc §9 |
-| EasyCore.Vector.Milvus | `src/EasyCore.Vector.Milvus` | [README.md](src/EasyCore.Vector.Milvus/README.md) | This doc §10 |
-| EasyCore.Vector.PostgreSQL | `src/EasyCore.Vector.PostgreSQL` | [README.md](src/EasyCore.Vector.PostgreSQL/README.md) | This doc §11 |
-| EasyCore.Vector.Elasticsearch | `src/EasyCore.Vector.Elasticsearch` | [README.md](src/EasyCore.Vector.Elasticsearch/README.md) | This doc §12 |
+| EasyCore.Agent.RAG | `src/EasyCore.Agent.RAG` | [RagREADME.md](readme/RagREADME.md) | [RagREADME.us.md](readme/RagREADME.us.md) |
+| EasyCore.Pipeline | `src/EasyCore.Pipeline` | [PipelineREADME.md](readme/PipelineREADME.md) | [PipelineREADME.us.md](readme/PipelineREADME.us.md) |
+| EasyCore.Vector.Redis | `src/EasyCore.Vector.Redis` | [RedisREADME.md](readme/RedisREADME.md) | [RedisREADME.us.md](readme/RedisREADME.us.md) |
+| EasyCore.Vector.Qdrant | `src/EasyCore.Vector.Qdrant` | [QdrantREADME.md](readme/QdrantREADME.md) | [QdrantREADME.us.md](readme/QdrantREADME.us.md) |
+| EasyCore.Vector.Milvus | `src/EasyCore.Vector.Milvus` | [MilvusREADME.md](readme/MilvusREADME.md) | [MilvusREADME.us.md](readme/MilvusREADME.us.md) |
+| EasyCore.Vector.PostgreSQL | `src/EasyCore.Vector.PostgreSQL` | [PostgreSQLREADME.md](readme/PostgreSQLREADME.md) | [PostgreSQLREADME.us.md](readme/PostgreSQLREADME.us.md) |
+| EasyCore.Vector.Elasticsearch | `src/EasyCore.Vector.Elasticsearch` | [ElasticsearchREADME.md](readme/ElasticsearchREADME.md) | [ElasticsearchREADME.us.md](readme/ElasticsearchREADME.us.md) |
 
 ---
 
@@ -247,6 +209,7 @@ ApiKey normalization strips `Bearer ` prefix and rejects non-ASCII characters.
 ---
 
 ## 6. EasyCore.Agent.RAG
+
 ### 6.1 Introduction
 
 ### 🎯 What Problem Does It Solve?
@@ -283,28 +246,8 @@ This library does **not** bind to a specific vector database and requires **no**
 
 ### 6.2.1 RAG Pipeline Overview
 
-```mermaid
-flowchart LR
-    subgraph Ingest["Ingestion"]
-        Doc["Source document"]
-        Chunker["DocumentChunker"]
-        Embed["Embedding model"]
-        Store["EasyCore.Vector.*"]
-        Doc --> Chunker --> Embed --> Store
-    end
+![2-1-rag-pipeline-overview](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-rag-pipeline-overview-30723cd3.svg)
 
-    subgraph Retrieve["Retrieval"]
-        UserQ["User question"]
-        Rewrite["QueryRewrite"]
-        MultiQ["MultiQueryGenerator"]
-        Search["Vector search"]
-        MMR["MmrSelector"]
-        Agent["Agent answer"]
-        UserQ --> Rewrite --> MultiQ --> Search --> MMR --> Agent
-    end
-
-    Store --> Search
-```
 
 ### 6.2.2 Module Responsibilities
 
@@ -317,22 +260,8 @@ flowchart LR
 
 ### 6.2.3 Query Rewrite Sequence
 
-```mermaid
-sequenceDiagram
-    participant User as User
-    participant App as Application
-    participant Agent as AIAgent
-    participant QR as QueryRewrite
+![2-3-query-rewrite-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-3-query-rewrite-sequence-ce95c915.svg)
 
-    User->>App: Latest question in multi-turn chat
-    App->>App: Load session ChatMessage history
-    App->>QR: RewriteAsync(query, agent, history)
-    QR->>QR: QueryRewritePromptBuilder.Build(...)
-    QR->>Agent: RunAsync(messages)
-    Agent-->>QR: Standalone rewritten query
-    QR-->>App: standalone query
-    App->>App: Embed + VectorSearch
-```
 
 ---
 
@@ -376,12 +305,6 @@ sequenceDiagram
 
 ```bash
 dotnet add package EasyCore.Agent.RAG
-```
-
-Or reference the project:
-
-```xml
-<ProjectReference Include="..\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
 ```
 
 ### 6.5.2 Document Chunking
@@ -666,35 +589,8 @@ var userPrompt = MultiQueryPromptBuilder.BuildUserPrompt(query, count: 5);
 
 ## 6.8 Full RAG Pipeline
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                      Ingestion Phase                         │
-├─────────────────────────────────────────────────────────────┤
-│  Source document                                             │
-│    ↓ DocumentChunker.Chunk                                   │
-│  DocumentChunk list                                          │
-│    ↓ Agent.EmbedAsync                                        │
-│  float[] vectors                                             │
-│    ↓ VectorStore.UpsertAsync                                 │
-│  Vector store (Redis / Qdrant / Milvus / PG / ES)            │
-└─────────────────────────────────────────────────────────────┘
+![8-full-rag-pipeline](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/8-full-rag-pipeline-40aa053a.svg)
 
-┌─────────────────────────────────────────────────────────────┐
-│                      Retrieval Phase                         │
-├─────────────────────────────────────────────────────────────┤
-│  User question (may contain pronouns / omissions)            │
-│    ↓ QueryRewrite.RewriteAsync (optional)                    │
-│  Standalone retrieval query                                  │
-│    ↓ MultiQueryGenerator.GenerateAsync (optional)            │
-│  Multiple retrieval queries                                  │
-│    ↓ EmbedAsync + VectorSearchAsync                          │
-│  Top-K candidates (may be semantically redundant)            │
-│    ↓ MmrSelector.Select (optional)                           │
-│  Diversified context chunks                                  │
-│    ↓ Agent.ChatRunAsync                                      │
-│  Final answer                                                │
-└─────────────────────────────────────────────────────────────┘
-```
 
 **Recommended combinations:**
 
@@ -817,6 +713,7 @@ Vector store controllers (Redis, Qdrant, Milvus, etc.) expose `*MmrSelector` end
 ---
 
 ## 7. EasyCore.Pipeline
+
 ### 7.1 Introduction
 
 ### 🎯 What Problem Does It Solve?
@@ -849,59 +746,13 @@ This library does **not** depend on LLM or Agent runtime. Use it with `EasyCore.
 
 ### 7.2.1 Component Diagram
 
-```mermaid
-flowchart TB
-    subgraph App["Application / Agent"]
-        Tool["PipelineTool / Service"]
-    end
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-6f2f0d68.svg)
 
-    subgraph PipelineLib["EasyCore.Pipeline"]
-        Create["Pipeline.Create()"]
-        Runner["PipelineRunner.RunAsync"]
-        Ctx["PipelineContext"]
-        Trace["PipelineTrace"]
-    end
-
-    subgraph Steps["Step Types"]
-        Func["AddFunc"]
-        Branch["AddBranch<br/>If / ElseIf / Else"]
-        Parallel["AddParallel<br/>AddFunc / AddFlow / AddBranch"]
-    end
-
-    Tool --> Create
-    Create --> Func
-    Create --> Branch
-    Create --> Parallel
-    Tool --> Runner
-    Runner --> Ctx
-    Func --> Trace
-    Branch --> Trace
-    Parallel --> Trace
-```
 
 ### 7.2.2 Pipeline Execution Sequence
 
-```mermaid
-sequenceDiagram
-    participant App as Application
-    participant Runner as PipelineRunner
-    participant Pipe as Pipeline
-    participant Ctx as PipelineContext
+![2-2-pipeline-execution-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-pipeline-execution-sequence-20db5d37.svg)
 
-    App->>App: Pipeline.Create().AddFunc(...).AddBranch(...)
-    App->>Ctx: new PipelineContext { Input = ... }
-    App->>Runner: RunAsync(pipeline, context)
-    Runner->>Pipe: RunAsync(context)
-
-    loop Each step
-        Pipe->>Pipe: ExecuteWithTraceAsync
-        Pipe->>Ctx: Read/write Input / Output / Items
-        Pipe->>Ctx: Traces.Add(trace)
-    end
-
-    Pipe-->>App: Done
-    App->>App: Read context.Output / context.Traces
-```
 
 ### 7.2.3 Branch + Parallel Flow (Demo)
 
@@ -952,13 +803,7 @@ Pure .NET class library — **no third-party NuGet packages**.
 
 ## 7.5 Quick Start
 
-### 7.5.1 Reference the Project
-
-```bash
-dotnet add reference ../EasyCore.Pipeline/EasyCore.Pipeline.csproj
-```
-
-Or install the NuGet package (when published):
+### 7.5.1 Install the Package
 
 ```bash
 dotnet add package EasyCore.Pipeline
@@ -1249,9 +1094,9 @@ Final: context.Output = last step output
 
 ## 7.11 FAQ
 
-### ❓ Q1: What scenarios is Pipeline best for?
+### ❓ Q1: How is Pipeline different from EasyCore.Agent.Workflow?
 
-`EasyCore.Pipeline` is a standalone lightweight orchestration library for multi-step flows within a single request: intent routing, branching, parallel execution, and trace observability. No DI registration required — call `Pipeline.Create()` directly after referencing the assembly.
+`EasyCore.Pipeline` is a standalone lightweight orchestration library; the demo uses it directly via `PipelineTool`. If your project wraps it as `EasyCore.Agent.Workflow`, the API style is similar — use whichever your project references.
 
 ### ❓ Q2: Do I need DI registration?
 
@@ -1336,6 +1181,7 @@ All branches finish through Step8 for a unified summary output.
 ---
 
 ## 8. EasyCore.Vector.Redis
+
 ### 8.1 Introduction
 
 ### 🎯 What Problem Does It Solve?
@@ -1369,56 +1215,13 @@ It shares a consistent API style with other vector backends (Qdrant, Milvus, Pos
 
 ### 8.2.1 Component Diagram
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core Application"]
-        Controller["Controller / Service"]
-        Entity["RedisTextVector : RedisVectorRecord"]
-    end
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-b97986d2.svg)
 
-    subgraph DI["Dependency Injection"]
-        Ext["EasyCoreRedis(...)"]
-        Options["RedisOptions"]
-        Multiplexer["IConnectionMultiplexer"]
-        Store["IRedisVectorStore"]
-    end
-
-    subgraph RedisStack["Redis Stack"]
-        Hash["Hash document storage<br/>{collection}:{id}"]
-        Index["RediSearch index<br/>{collection}:idx"]
-        KNN["KNN vector search"]
-        Filter["Scalar filter query"]
-    end
-
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Multiplexer
-    Ext --> Store
-    Store --> Hash
-    Store --> Index
-    Index --> KNN
-    Index --> Filter
-```
 
 ### 8.2.2 Vector Search Sequence
 
-```mermaid
-sequenceDiagram
-    participant App as Application Code
-    participant Store as RedisVectorStore
-    participant FT as RediSearch (FT)
-    participant DB as Redis Hash
+![2-2-vector-search-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-vector-search-sequence-1033e99e.svg)
 
-    App->>Store: VectorSearchAsync(collection, vectorName, vector, options)
-    Store->>Store: BuildFilterExpression(options.Filter)
-    Store->>Store: Build KNN Query (Dialect 2)
-    Store->>FT: SearchAsync(indexName, query)
-    FT->>DB: Scan matching Hashes + compute vector distance
-    FT-->>Store: Return Document + score
-    Store->>Store: ConvertDistanceToScore + threshold filter
-    Store-->>App: List<RedisVectorSearchResult<TRecord>>
-```
 
 ### 8.2.3 Storage Model
 
@@ -1480,12 +1283,6 @@ docker run -d --name redis-stack -p 6379:6379 redis/redis-stack:latest
 
 ```bash
 dotnet add package EasyCore.Vector.Redis
-```
-
-Or reference the project directly in your solution:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Redis\EasyCore.Vector.Redis.csproj" />
 ```
 
 ### 8.5.2 Register Services
@@ -2088,6 +1885,7 @@ dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ---
 
 ## 9. EasyCore.Vector.Qdrant
+
 ### 9.1 Introduction
 
 ### 🎯 What Problem Does It Solve?
@@ -2131,67 +1929,13 @@ It shares a consistent API style with other vector backends (Redis, Milvus, Post
 
 ### 9.2.1 Component Diagram
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core Application"]
-        Controller["Controller / Service"]
-        Entity["QdrantTextVector : QdrantVectorRecord"]
-    end
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-acd281f2.svg)
 
-    subgraph DI["Dependency Injection"]
-        Ext["EasyCoreQdrant(...)"]
-        Options["QdrantOptions"]
-        Client["QdrantClient"]
-        Store["IQdrantVectorStore"]
-    end
-
-    subgraph QdrantServer["Qdrant Server (gRPC :6334)"]
-        Collection["Collection<br/>Named Dense + Sparse Vectors"]
-        Payload["Point Payload<br/>content / metadata / record"]
-        DenseSearch["Dense vector ANN search"]
-        SparseSearch["Sparse vector search"]
-        Filter["Payload filter"]
-    end
-
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Client
-    Ext --> Store
-    Store --> Client
-    Client --> Collection
-    Collection --> Payload
-    Collection --> DenseSearch
-    Collection --> SparseSearch
-    DenseSearch --> Filter
-    SparseSearch --> Filter
-```
 
 ### 9.2.2 Hybrid Search Sequence (Dense + Sparse)
 
-```mermaid
-sequenceDiagram
-    participant App as Application Code
-    participant Store as QdrantVectorStore
-    participant QC as Qdrant gRPC Client
-    participant DB as Qdrant Collection
+![2-2-hybrid-search-sequence-dense-sparse](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-hybrid-search-sequence-dense-sparse-03c9f719.svg)
 
-    App->>Store: HybridSearchAsync(denseVector, sparseVector, denseWeight, sparseWeight)
-    Store->>Store: candidateLimit = Limit × 3
-    par Parallel recall
-        Store->>QC: VectorSearchAsync (dense)
-        QC->>DB: ANN Search (dense)
-        DB-->>QC: dense results + score
-        QC-->>Store: dense results
-    and
-        Store->>QC: SparseSearchAsync (sparse)
-        QC->>DB: Sparse Search (indices + values)
-        DB-->>QC: sparse results + score
-        QC-->>Store: sparse results
-    end
-    Store->>Store: Merge by Id + normalize scores + weighted sum
-    Store-->>App: List<QdrantQdrantVectorSearchResult<TRecord>>
-```
 
 ### 9.2.3 Storage Model
 
@@ -2255,12 +1999,6 @@ docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 ```bash
 dotnet add package EasyCore.Vector.Qdrant
-```
-
-Or reference the project directly in your solution:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Qdrant\EasyCore.Vector.Qdrant.csproj" />
 ```
 
 ### 9.5.2 Register Services
@@ -2906,6 +2644,7 @@ Demo entity: `demo/AspCoreAgent/VectorEntity/QdrantTextVector.cs`.
 ---
 
 ## 10. EasyCore.Vector.Milvus
+
 ### 10.1 Introduction
 
 **EasyCore.Vector.Milvus** wraps the Milvus SDK with strongly typed APIs consistent across EasyCore vector backends — ideal for large-scale vector retrieval and RAG knowledge bases.
@@ -2921,13 +2660,8 @@ EasyCore.Agent → EasyCore.Agent.RAG → EasyCore.Vector.*
 
 ## 10.2 Architecture
 
-```mermaid
-flowchart TB
-    App["ASP.NET Core"] --> Store["IMilvusVectorStore"]
-    Store --> Client["MilvusClient (gRPC)"]
-    Client --> Milvus["Milvus Server"]
-    Milvus --> Collection["Collection + Index"]
-```
+![2-architecture](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-架构图-ef6518fd.svg)
+
 
 ---
 
@@ -3099,16 +2833,8 @@ After upsert, data sits in growing segments; collections must be loaded for sear
 | `LoadAsync(collectionName)` | Load collection into query node memory |
 | `ReleaseAsync(collectionName)` | Release from memory |
 
-```mermaid
-stateDiagram-v2
-    [*] --> Created: CreateCollection
-    Created --> Growing: Upsert
-    Growing --> Sealed: FlushAsync
-    Sealed --> Loaded: LoadAsync
-    Loaded --> Searching: VectorSearch
-    Loaded --> Released: ReleaseAsync
-    Released --> Loaded: LoadAsync
-```
+![9-milvus-lifecycle-management](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/9-milvus-生命周期管理-0e62eac8.svg)
+
 
 > Search auto-calls `LoadAsync` internally; call `FlushAsync` explicitly after bulk writes.
 
@@ -3201,6 +2927,7 @@ dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ---
 
 ## 11. EasyCore.Vector.PostgreSQL
+
 ### 11.1 Introduction
 
 ### 🎯 What Problem Does It Solve?
@@ -3234,58 +2961,13 @@ It shares the same API style as other vector backends (Redis, Qdrant, Milvus, El
 
 ### 11.2.1 Component Diagram
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core Application"]
-        Controller["Controller / Service"]
-        Entity["PostgreSqlTextVector : PostgreSqlVectorRecord"]
-    end
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-57c46610.svg)
 
-    subgraph DI["Dependency Injection"]
-        Ext["EasyCorePostgreSql(...)"]
-        Options["PostgreSqlOptions"]
-        DataSource["NpgsqlDataSource + UseVector()"]
-        Store["IPostgreSqlVectorStore"]
-    end
-
-    subgraph PostgreSQL["PostgreSQL + pgvector"]
-        Ext2["vector extension"]
-        Table["Collection table<br/>public.{collection}"]
-        Index["HNSW / IVFFlat vector index"]
-        KNN["Vector distance ops<br/><=> / <-> / <#>"]
-        Filter["SQL WHERE scalar filter"]
-    end
-
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Store
-    Store --> DataSource
-    DataSource --> Ext2
-    Store --> Table
-    Store --> Index
-    Table --> KNN
-    Table --> Filter
-```
 
 ### 11.2.2 Vector Search Sequence
 
-```mermaid
-sequenceDiagram
-    participant App as Application
-    participant Store as PostgreSqlVectorStore
-    participant PG as PostgreSQL (pgvector)
-    participant Table as Collection table
+![2-2-vector-search-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-vector-search-sequence-49b0592d.svg)
 
-    App->>Store: VectorSearchAsync(collection, vectorName, vector, options)
-    Store->>Store: BuildFilterSql(options.Filter)
-    Store->>Store: Build Score expression (Cosine/L2/IP)
-    Store->>PG: Execute parameterized SELECT + ORDER BY score DESC
-    PG->>Table: Scan rows + compute vector distance
-    PG-->>Store: Return rows + score
-    Store->>Store: Apply ScoreThreshold filter
-    Store-->>App: List<PostgreSqlVectorSearchResult<TRecord>>
-```
 
 ### 11.2.3 Storage Model
 
@@ -3408,12 +3090,6 @@ docker exec -it pgvector psql -U postgres -d vector_db -c "SELECT extname, extve
 
 ```bash
 dotnet add package EasyCore.Vector.PostgreSQL
-```
-
-Or reference the project directly:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.PostgreSQL\EasyCore.Vector.PostgreSQL.csproj" />
 ```
 
 ### 11.5.2 Register Services
@@ -4079,6 +3755,7 @@ Demo entity: `demo/AspCoreAgent/VectorEntity/PostgreSqlTextVector.cs`.
 ---
 
 ## 12. EasyCore.Vector.Elasticsearch
+
 ### 12.1 Introduction
 
 ### 🎯 What Problem Does It Solve?
@@ -4112,55 +3789,13 @@ It shares the same API style as other vector backends (Redis, Qdrant, Milvus, Po
 
 ### 12.2.1 Component Diagram
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core Application"]
-        Controller["Controller / Service"]
-        Entity["ElasticsearchTextVector : ElasticsearchVectorRecord"]
-    end
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-50381ee1.svg)
 
-    subgraph DI["Dependency Injection"]
-        Ext["EasyCoreElasticsearch(...)"]
-        Options["ElasticsearchOptions"]
-        Store["IElasticsearchVectorStore"]
-    end
-
-    subgraph ES["Elasticsearch 8+"]
-        Index["Index (Collection)<br/>lowercase-normalized name"]
-        Doc["Document<br/>_id = Record.Id"]
-        KNN["KNN dense_vector search"]
-        Filter["Bool / Term / Range filters"]
-    end
-
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Store
-    Store --> Index
-    Store --> Doc
-    Index --> KNN
-    Index --> Filter
-```
 
 ### 12.2.2 Vector Search Sequence
 
-```mermaid
-sequenceDiagram
-    participant App as Application Code
-    participant Store as ElasticsearchVectorStore
-    participant Client as Elastic.Clients.Elasticsearch
-    participant ES as Elasticsearch
+![2-2-vector-search-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-vector-search-sequence-07298f97.svg)
 
-    App->>Store: VectorSearchAsync(collection, vectorName, vector, options)
-    Store->>Store: ToIndexName(collection) + BuildFilterQuery(options.Filter)
-    Store->>Store: Build KnnSearch (k, num_candidates, filter)
-    Store->>Client: SearchAsync(indexName, knn + min_score)
-    Client->>ES: POST /{index}/_search
-    ES-->>Client: hits + _score
-    Client-->>Store: SearchResponse
-    Store->>Store: ReadSearchResults + ScoreThreshold filtering
-    Store-->>App: List<ElasticsearchVectorSearchResult<TRecord>>
-```
 
 ### 12.2.3 Storage Model
 
@@ -4228,12 +3863,6 @@ docker run -d --name elasticsearch \
 
 ```bash
 dotnet add package EasyCore.Vector.Elasticsearch
-```
-
-Or reference the project directly:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Elasticsearch\EasyCore.Vector.Elasticsearch.csproj" />
 ```
 
 ### 12.5.2 Register Services

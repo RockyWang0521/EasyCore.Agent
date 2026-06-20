@@ -51,7 +51,7 @@ EasyCore.Agent → EasyCore.Agent.RAG → EasyCore.Vector.*
 
 ## 2. Architecture
 
-![2-architecture](docs/svg/2-架构图-ef6518fd.svg)
+![2-architecture](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-架构图-ef6518fd.svg)
 
 
 ---
@@ -224,7 +224,7 @@ After upsert, data sits in growing segments; collections must be loaded for sear
 | `LoadAsync(collectionName)` | Load collection into query node memory |
 | `ReleaseAsync(collectionName)` | Release from memory |
 
-![9-milvus-lifecycle-management](docs/svg/9-milvus-生命周期管理-0e62eac8.svg)
+![9-milvus-lifecycle-management](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/9-milvus-生命周期管理-0e62eac8.svg)
 
 
 > Search auto-calls `LoadAsync` internally; call `FlushAsync` explicitly after bulk writes.

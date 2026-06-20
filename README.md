@@ -105,83 +105,19 @@ EasyCore.Agent/
 
 ### 2.1 组件关系图
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core 应用"]
-        API["Controllers / Services"]
-        Tools["AITool 业务工具"]
-    end
+![diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/diagram-01-9a7a0347.svg)
 
-    subgraph Agent["EasyCore.Agent"]
-        Client["BasicAgentClient"]
-        CtxStore["IAgentContextStore<br/>Memory / Redis"]
-        ToolProv["IAIToolProvider"]
-    end
-
-    subgraph RAG["EasyCore.Agent.RAG"]
-        Chunk["DocumentChunker"]
-        Rewrite["QueryRewrite"]
-        MultiQ["MultiQueryGenerator"]
-        MMR["MmrSelector"]
-    end
-
-    subgraph Orch["编排"]
-        Pipe["EasyCore.Pipeline"]
-    end
-
-    subgraph Vector["EasyCore.Vector.*"]
-        Redis["Redis"]
-        Qdrant["Qdrant"]
-        Milvus["Milvus"]
-        PG["PostgreSQL"]
-        ES["Elasticsearch"]
-    end
-
-    API --> Client
-    API --> Tools
-    Tools --> ToolProv
-    Client --> CtxStore
-    API --> Chunk
-    API --> Rewrite
-    API --> MultiQ
-    API --> MMR
-    API --> Pipe
-    API --> Redis
-    API --> Qdrant
-    API --> Milvus
-    API --> PG
-    API --> ES
-    Chunk --> Redis
-    Rewrite --> Client
-```
 
 ### 2.2 RAG 问答时序
 
-```mermaid
-sequenceDiagram
-    participant User as 用户
-    participant App as 业务 API
-    participant RAG as EasyCore.Agent.RAG
-    participant Agent as EasyCore.Agent
-    participant VS as EasyCore.Vector.*
+![diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/diagram-02-178b751a.svg)
 
-    User->>App: 多轮提问
-    App->>Agent: 读取 session 历史
-    App->>RAG: QueryRewrite.RewriteAsync
-    RAG->>Agent: LLM 改写 Query
-    App->>RAG: MultiQueryGenerator.GenerateAsync
-    App->>Agent: EmbedAsync(query)
-    App->>VS: VectorSearchAsync
-    VS-->>App: Top-K 文档块
-    App->>RAG: MmrSelector.Select
-    App->>Agent: ChatRunAsync(上下文 + 检索结果)
-    Agent-->>User: 最终答案
-```
 
 ### 2.3 架构 SVG（历史图示）
 
-- [组件关系图（中文 SVG）](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/architecture-cn.svg)
-- [会话调用时序（中文 SVG）](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/png/sequence-cn.svg)
+![architecture-cn](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/architecture-cn.svg)
+
+![sequence-cn](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/sequence-cn.svg)
 
 ---
 
@@ -190,13 +126,13 @@ sequenceDiagram
 | 项目 | 路径 | 中文文档 | 英文文档 |
 |---|---|---|---|
 | EasyCore.Agent | `src/EasyCore.Agent/EasyCore.Agent` | 本文档 §5 | [README.en.md](README.en.md) |
-| EasyCore.Agent.RAG | `src/EasyCore.Agent.RAG` | 本文档 §6 | [README.us.md](src/EasyCore.Agent.RAG/README.us.md) |
-| EasyCore.Pipeline | `src/EasyCore.Pipeline` | 本文档 §7 | [README.us.md](src/EasyCore.Pipeline/README.us.md) |
-| EasyCore.Vector.Redis | `src/EasyCore.Vector.Redis` | 本文档 §8 | [README.us.md](src/EasyCore.Vector.Redis/README.us.md) |
-| EasyCore.Vector.Qdrant | `src/EasyCore.Vector.Qdrant` | 本文档 §9 | [README.us.md](src/EasyCore.Vector.Qdrant/README.us.md) |
-| EasyCore.Vector.Milvus | `src/EasyCore.Vector.Milvus` | 本文档 §10 | [README.us.md](src/EasyCore.Vector.Milvus/README.us.md) |
-| EasyCore.Vector.PostgreSQL | `src/EasyCore.Vector.PostgreSQL` | 本文档 §11 | [README.us.md](src/EasyCore.Vector.PostgreSQL/README.us.md) |
-| EasyCore.Vector.Elasticsearch | `src/EasyCore.Vector.Elasticsearch` | 本文档 §12 | [README.us.md](src/EasyCore.Vector.Elasticsearch/README.us.md) |
+| EasyCore.Agent.RAG | `src/EasyCore.Agent.RAG` | [RagREADME.md](readme/RagREADME.md) | [RagREADME.us.md](readme/RagREADME.us.md) |
+| EasyCore.Pipeline | `src/EasyCore.Pipeline` | [PipelineREADME.md](readme/PipelineREADME.md) | [PipelineREADME.us.md](readme/PipelineREADME.us.md) |
+| EasyCore.Vector.Redis | `src/EasyCore.Vector.Redis` | [RedisREADME.md](readme/RedisREADME.md) | [RedisREADME.us.md](readme/RedisREADME.us.md) |
+| EasyCore.Vector.Qdrant | `src/EasyCore.Vector.Qdrant` | [QdrantREADME.md](readme/QdrantREADME.md) | [QdrantREADME.us.md](readme/QdrantREADME.us.md) |
+| EasyCore.Vector.Milvus | `src/EasyCore.Vector.Milvus` | [MilvusREADME.md](readme/MilvusREADME.md) | [MilvusREADME.us.md](readme/MilvusREADME.us.md) |
+| EasyCore.Vector.PostgreSQL | `src/EasyCore.Vector.PostgreSQL` | [PostgreSQLREADME.md](readme/PostgreSQLREADME.md) | [PostgreSQLREADME.us.md](readme/PostgreSQLREADME.us.md) |
+| EasyCore.Vector.Elasticsearch | `src/EasyCore.Vector.Elasticsearch` | [ElasticsearchREADME.md](readme/ElasticsearchREADME.md) | [ElasticsearchREADME.us.md](readme/ElasticsearchREADME.us.md) |
 
 ---
 
@@ -465,6 +401,7 @@ var answer = await deepSeekAgent.ChatRunAsync(sessionId, agent, prompt);
 ---
 
 ## 6. EasyCore.Agent.RAG
+
 ### 6.1 项目简介
 
 ### 🎯 解决什么问题？
@@ -499,32 +436,12 @@ EasyCore.Agent（Agent SDK / Embedding / 会话上下文）
 
 ## 6.2 架构图
 
-### 2.1 RAG 链路总览
+### 6.2.1 RAG 链路总览
 
-```mermaid
-flowchart LR
-    subgraph Ingest["入库阶段"]
-        Doc["原始文档"]
-        Chunker["DocumentChunker"]
-        Embed["Embedding 模型"]
-        Store["EasyCore.Vector.*"]
-        Doc --> Chunker --> Embed --> Store
-    end
+![2-1-rag-链路总览](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-rag-链路总览-7d4e369a.svg)
 
-    subgraph Retrieve["检索阶段"]
-        UserQ["用户提问"]
-        Rewrite["QueryRewrite"]
-        MultiQ["MultiQueryGenerator"]
-        Search["向量检索"]
-        MMR["MmrSelector"]
-        Agent["Agent 生成答案"]
-        UserQ --> Rewrite --> MultiQ --> Search --> MMR --> Agent
-    end
 
-    Store --> Search
-```
-
-### 2.2 各模块职责
+### 6.2.2 各模块职责
 
 | 模块 | 类型 | 是否依赖 LLM | 说明 |
 |---|---|---|---|
@@ -533,24 +450,10 @@ flowchart LR
 | `MultiQueryGenerator` | 静态工具 | 是 | 从一个问题生成多条检索 Query |
 | `MmrSelector` | 静态工具 | 否 | 在相关性与多样性间做 MMR 平衡 |
 
-### 2.3 Query Rewrite 时序
+### 6.2.3 Query Rewrite 时序
 
-```mermaid
-sequenceDiagram
-    participant User as 用户
-    participant App as 业务代码
-    participant Agent as AIAgent
-    participant QR as QueryRewrite
+![2-3-query-rewrite-时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-3-query-rewrite-时序-db16607d.svg)
 
-    User->>App: 多轮对话中的最新问题
-    App->>App: 读取 session 历史 ChatMessage
-    App->>QR: RewriteAsync(query, agent, history)
-    QR->>QR: QueryRewritePromptBuilder.Build(...)
-    QR->>Agent: RunAsync(messages)
-    Agent-->>QR: 改写后的独立 Query
-    QR-->>App: standalone query
-    App->>App: Embed + VectorSearch
-```
 
 ---
 
@@ -568,18 +471,18 @@ sequenceDiagram
 
 ## 6.4 环境要求
 
-### 4.1 .NET 版本
+### 6.4.1 .NET 版本
 
 - .NET 8.0 及以上
 
-### 4.2 NuGet 依赖
+### 6.4.2 NuGet 依赖
 
 | 包 | 用途 |
 |---|---|
 | `Microsoft.Agents.AI` | `AIAgent`、`ChatMessage` 等 Agent 运行时 |
 | `Microsoft.Agents.AI.OpenAI` | OpenAI 兼容模型接入（通过 EasyCore.Agent 间接使用） |
 
-### 4.3 配合使用的组件
+### 6.4.3 配合使用的组件
 
 | 组件 | 用途 |
 |---|---|
@@ -590,19 +493,13 @@ sequenceDiagram
 
 ## 6.5 快速开始
 
-### 5.1 安装包
+### 6.5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Agent.RAG
 ```
 
-或引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
-```
-
-### 5.2 文档切块
+### 6.5.2 文档切块
 
 ```csharp
 using EasyCore.Agent.RAG;
@@ -621,7 +518,7 @@ foreach (var chunk in chunks)
 }
 ```
 
-### 5.3 Query Rewrite
+### 6.5.3 Query Rewrite
 
 ```csharp
 using EasyCore.Agent.RAG;
@@ -638,7 +535,7 @@ var rewritten = await QueryRewrite.RewriteAsync(
 // 可能输出："EasyCore.Agent 支持哪些功能？"
 ```
 
-### 5.4 Multi Query
+### 6.5.4 Multi Query
 
 ```csharp
 var queries = await MultiQueryGenerator.GenerateAsync(
@@ -652,7 +549,7 @@ var queries = await MultiQueryGenerator.GenerateAsync(
 // - 员工休假制度有哪些规定？
 ```
 
-### 5.5 MMR 去重
+### 6.5.5 MMR 去重
 
 ```csharp
 var candidates = searchResults.Select(x => new MmrCandidate
@@ -673,7 +570,7 @@ var diversified = MmrSelector.Select(
 
 ## 6.6 模块说明
 
-### 6.1 DocumentChunker
+### 6.6.1 DocumentChunker
 
 | 成员 | 说明 |
 |---|---|
@@ -693,7 +590,7 @@ var diversified = MmrSelector.Select(
 - 每个 chunk 自动生成唯一 `Id`（GUID N 格式）；
 - 空白 chunk 会被跳过。
 
-### 6.2 DocumentChunk
+### 6.6.2 DocumentChunk
 
 | 属性 | 类型 | 说明 |
 |---|---|---|
@@ -704,7 +601,7 @@ var diversified = MmrSelector.Select(
 | `StartIndex` | `int` | 在原文中的起始字符位置 |
 | `EndIndex` | `int` | 在原文中的结束字符位置 |
 
-### 6.3 QueryRewrite
+### 6.6.3 QueryRewrite
 
 | 方法 | 说明 |
 |---|---|
@@ -722,7 +619,7 @@ var diversified = MmrSelector.Select(
 5. 若问题已足够清晰则原样返回；
 6. 仅输出纯文本 Query。
 
-### 6.4 MultiQueryGenerator
+### 6.6.4 MultiQueryGenerator
 
 | 方法 | 说明 |
 |---|---|
@@ -737,7 +634,7 @@ var diversified = MmrSelector.Select(
 - 若结果中不包含原问题，则将其插入首位；
 - 最终返回不超过 `count` 条。
 
-### 6.5 MmrSelector
+### 6.6.5 MmrSelector
 
 | 方法 | 说明 |
 |---|---|
@@ -755,7 +652,7 @@ MMR = λ × relevanceScore − (1 − λ) × maxSimilarity(selected)
 
 **过滤规则：** 无向量（`Vector.Length == 0`）的候选会被排除。
 
-### 6.6 MmrCandidate
+### 6.6.6 MmrCandidate
 
 | 属性 | 类型 | 说明 |
 |---|---|---|
@@ -768,7 +665,7 @@ MMR = λ × relevanceScore − (1 − λ) × maxSimilarity(selected)
 
 ## 6.7 API 使用示例
 
-### 7.1 入库：切块 + Embedding + 向量写入
+### 6.7.1 入库：切块 + Embedding + 向量写入
 
 ```csharp
 using EasyCore.Agent.RAG;
@@ -798,7 +695,7 @@ foreach (var chunk in chunks)
 }
 ```
 
-### 7.2 检索：Rewrite → Embed → Search
+### 6.7.2 检索：Rewrite → Embed → Search
 
 ```csharp
 var history = deepSeekAgent.GetChatContext(sessionId);
@@ -817,7 +714,7 @@ var results = await vectorStore.VectorSearchAsync<RedisTextVector>(
     });
 ```
 
-### 7.3 Multi Query 多路检索
+### 6.7.3 Multi Query 多路检索
 
 ```csharp
 var queries = await MultiQueryGenerator.GenerateAsync(userMessage, agent, count: 5);
@@ -841,7 +738,7 @@ foreach (var q in queries)
 var topResults = merged.Values.OrderByDescending(x => x.Score).Take(10).ToList();
 ```
 
-### 7.4 MMR + Agent 回答
+### 6.7.4 MMR + Agent 回答
 
 ```csharp
 var mmrCandidates = topResults.Select(x => new MmrCandidate
@@ -862,7 +759,7 @@ var answer = await agentClient.ChatRunAsync(
     $"参考以下资料回答问题：\n\n{context}\n\n问题：{userMessage}");
 ```
 
-### 7.5 自定义 Prompt（QueryRewrite）
+### 6.7.5 自定义 Prompt（QueryRewrite）
 
 ```csharp
 // 直接使用 PromptBuilder 构建消息，再自行调用 Agent
@@ -873,7 +770,7 @@ var customSystem = QueryRewritePromptBuilder.GetSystemPrompt();
 // 基于 customSystem 自行组装 messages...
 ```
 
-### 7.6 自定义 Prompt（MultiQuery）
+### 6.7.6 自定义 Prompt（MultiQuery）
 
 ```csharp
 var messages = MultiQueryPromptBuilder.Build(query, count: 5);
@@ -886,35 +783,8 @@ var userPrompt = MultiQueryPromptBuilder.BuildUserPrompt(query, count: 5);
 
 ## 6.8 完整 RAG 流水线
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                        入库阶段                              │
-├─────────────────────────────────────────────────────────────┤
-│  原始文档                                                    │
-│    ↓ DocumentChunker.Chunk                                  │
-│  DocumentChunk 列表                                          │
-│    ↓ Agent.EmbedAsync                                       │
-│  float[] 向量                                                │
-│    ↓ VectorStore.UpsertAsync                                │
-│  向量库（Redis / Qdrant / Milvus / PG / ES）                 │
-└─────────────────────────────────────────────────────────────┘
+![8-完整-rag-流水线](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/8-完整-rag-流水线-d3fe635b.svg)
 
-┌─────────────────────────────────────────────────────────────┐
-│                        检索阶段                              │
-├─────────────────────────────────────────────────────────────┤
-│  用户提问（可能含指代、省略）                                  │
-│    ↓ QueryRewrite.RewriteAsync（可选）                       │
-│  独立检索 Query                                              │
-│    ↓ MultiQueryGenerator.GenerateAsync（可选）               │
-│  多条检索 Query                                              │
-│    ↓ EmbedAsync + VectorSearchAsync                         │
-│  Top-K 候选（可能含重复语义）                                 │
-│    ↓ MmrSelector.Select（可选）                              │
-│  多样化上下文片段                                              │
-│    ↓ Agent.ChatRunAsync                                     │
-│  最终回答                                                    │
-└─────────────────────────────────────────────────────────────┘
-```
 
 **推荐组合：**
 
@@ -975,7 +845,7 @@ Prompt 已要求「与用户问题同语言」。若模型仍偏离，可修改 
 
 ## 6.11 EasyCore.Agent.RAG 详细介绍
 
-### 11.1 设计目标
+### 6.11.1 设计目标
 
 `EasyCore.Agent.RAG` 聚焦 **RAG 检索链路中的可复用算法与 Prompt 封装**，而非重复实现 Agent 或向量库能力。设计原则：
 
@@ -984,7 +854,7 @@ Prompt 已要求「与用户问题同语言」。若模型仍偏离，可修改 
 3. **与 Agent 协作**：Rewrite / MultiQuery 通过标准 `AIAgent` 接口调用 LLM；
 4. **企业可扩展**：Prompt Builder 公开，允许业务覆盖 System Prompt。
 
-### 11.2 类型一览
+### 6.11.2 类型一览
 
 ```
 EasyCore.Agent.RAG
@@ -1002,7 +872,7 @@ EasyCore.Agent.RAG
     └── MmrCandidate             # MMR 候选模型
 ```
 
-### 11.3 典型落地步骤
+### 6.11.3 典型落地步骤
 
 1. 引用 `EasyCore.Agent.RAG` 与目标 `EasyCore.Vector.*`；
 2. 注册 `EasyCore.Agent` 与向量库 DI；
@@ -1016,13 +886,13 @@ EasyCore.Agent.RAG
 
 `AspCoreAgent` Demo 的 `EmbeddingController` 提供了 RAG 相关 API 示例。
 
-### 12.1 启动 Demo
+### 6.12.1 启动 Demo
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ```
 
-### 12.2 RAG 相关端点
+### 6.12.2 RAG 相关端点
 
 | 端点 | 说明 |
 |---|---|
@@ -1037,6 +907,7 @@ dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ---
 
 ## 7. EasyCore.Pipeline
+
 ### 7.1 项目简介
 
 ### 🎯 解决什么问题？
@@ -1067,63 +938,17 @@ EasyCore.Agent（Agent SDK / Tool Calling / 会话上下文）
 
 ## 7.2 架构图
 
-### 2.1 组件关系图
+### 7.2.1 组件关系图
 
-```mermaid
-flowchart TB
-    subgraph App["业务 / Agent 应用"]
-        Tool["PipelineTool / Service"]
-    end
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-405637b9.svg)
 
-    subgraph PipelineLib["EasyCore.Pipeline"]
-        Create["Pipeline.Create()"]
-        Runner["PipelineRunner.RunAsync"]
-        Ctx["PipelineContext"]
-        Trace["PipelineTrace"]
-    end
 
-    subgraph Steps["步骤类型"]
-        Func["AddFunc"]
-        Branch["AddBranch<br/>If / ElseIf / Else"]
-        Parallel["AddParallel<br/>AddFunc / AddFlow / AddBranch"]
-    end
+### 7.2.2 一次 Pipeline 执行时序
 
-    Tool --> Create
-    Create --> Func
-    Create --> Branch
-    Create --> Parallel
-    Tool --> Runner
-    Runner --> Ctx
-    Func --> Trace
-    Branch --> Trace
-    Parallel --> Trace
-```
+![2-2-一次-pipeline-执行时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-一次-pipeline-执行时序-5789ca41.svg)
 
-### 2.2 一次 Pipeline 执行时序
 
-```mermaid
-sequenceDiagram
-    participant App as 业务代码
-    participant Runner as PipelineRunner
-    participant Pipe as Pipeline
-    participant Ctx as PipelineContext
-
-    App->>App: Pipeline.Create().AddFunc(...).AddBranch(...)
-    App->>Ctx: new PipelineContext { Input = ... }
-    App->>Runner: RunAsync(pipeline, context)
-    Runner->>Pipe: RunAsync(context)
-
-    loop 每个步骤
-        Pipe->>Pipe: ExecuteWithTraceAsync
-        Pipe->>Ctx: 读写 Input / Output / Items
-        Pipe->>Ctx: Traces.Add(trace)
-    end
-
-    Pipe-->>App: 执行完成
-    App->>App: 读取 context.Output / context.Traces
-```
-
-### 2.3 分支 + 并行流程图（Demo 场景）
+### 7.2.3 分支 + 并行流程图（Demo 场景）
 
 ```text
 Step1 意图识别
@@ -1153,15 +978,15 @@ Step8 最终总结
 
 ## 7.4 环境要求
 
-### 4.1 .NET 版本
+### 7.4.1 .NET 版本
 
 - .NET 8.0 及以上
 
-### 4.2 依赖
+### 7.4.2 依赖
 
 本库为**纯 .NET 类库**，不引用第三方 NuGet 包。
 
-### 4.3 可选配合组件
+### 7.4.3 可选配合组件
 
 | 组件 | 用途 |
 |---|---|
@@ -1172,19 +997,13 @@ Step8 最终总结
 
 ## 7.5 快速开始
 
-### 5.1 引用项目
-
-```bash
-dotnet add reference ../EasyCore.Pipeline/EasyCore.Pipeline.csproj
-```
-
-或安装 NuGet 包（若已发布）：
+### 7.5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Pipeline
 ```
 
-### 5.2 最简顺序流程
+### 7.5.2 最简顺序流程
 
 ```csharp
 using EasyCore.Pipeline;
@@ -1206,7 +1025,7 @@ await PipelineRunner.RunAsync(pipeline, context);
 Console.WriteLine(context.Output); // Hello, World!
 ```
 
-### 5.3 带分支的流程
+### 7.5.3 带分支的流程
 
 ```csharp
 var pipeline = Pipeline.Create()
@@ -1221,7 +1040,7 @@ var context = new PipelineContext { Input = "1" };
 await PipelineRunner.RunAsync(pipeline, context);
 ```
 
-### 5.4 带并行的流程
+### 7.5.4 带并行的流程
 
 ```csharp
 var pipeline = Pipeline.Create()
@@ -1239,7 +1058,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 
 ## 7.6 核心类型说明
 
-### 6.1 Pipeline
+### 7.6.1 Pipeline
 
 | 方法 | 说明 |
 |---|---|
@@ -1253,7 +1072,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 
 每个步骤执行时自动写入 `context.Traces`。
 
-### 6.2 PipelineContext
+### 7.6.2 PipelineContext
 
 | 成员 | 类型 | 说明 |
 |---|---|---|
@@ -1272,7 +1091,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 | `Get<T>(key)` | 强类型读取 |
 | `Next(output)` | 设置 `Output` 并将 `Input` 更新为 `output` |
 
-### 6.3 BranchBuilder
+### 7.6.3 BranchBuilder
 
 | 方法 | 说明 |
 |---|---|
@@ -1284,7 +1103,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 
 分支执行时会在 `Items["__current_branch"]` 写入 `"If"` / `"ElseIf"` / `"Else"`。
 
-### 6.4 ParallelBuilder
+### 7.6.4 ParallelBuilder
 
 | 方法 | 说明 |
 |---|---|
@@ -1294,7 +1113,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 
 **执行规则：** 所有子 Pipeline 通过 `Task.WhenAll` 并发执行，共享同一个 `PipelineContext`。
 
-### 6.5 PipelineTrace
+### 7.6.5 PipelineTrace
 
 | 字段 | 说明 |
 |---|---|
@@ -1305,7 +1124,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 | `Success` | 是否成功 |
 | `ErrorMessage` | 失败时的异常消息 |
 
-### 6.6 PipelineRunner
+### 7.6.6 PipelineRunner
 
 | 方法 | 说明 |
 |---|---|
@@ -1315,7 +1134,7 @@ Console.WriteLine(context.Output); // result-A + result-B
 
 ## 7.7 API 使用示例
 
-### 7.1 异步步骤与 CancellationToken
+### 7.7.1 异步步骤与 CancellationToken
 
 ```csharp
 var pipeline = Pipeline.Create()
@@ -1326,7 +1145,7 @@ var pipeline = Pipeline.Create()
     });
 ```
 
-### 7.2 嵌套 Branch
+### 7.7.2 嵌套 Branch
 
 ```csharp
 var pipeline = Pipeline.Create()
@@ -1337,7 +1156,7 @@ var pipeline = Pipeline.Create()
                 .Else(f => f.AddFunc(c => c.Set("tier", "low"))))));
 ```
 
-### 7.3 Parallel 中添加子流程
+### 7.7.3 Parallel 中添加子流程
 
 ```csharp
 var pipeline = Pipeline.Create()
@@ -1348,7 +1167,7 @@ var pipeline = Pipeline.Create()
         .AddFunc(ctx => ctx.Set("quick", "c")));
 ```
 
-### 7.4 读取执行轨迹
+### 7.7.4 读取执行轨迹
 
 ```csharp
 await PipelineRunner.RunAsync(pipeline, context);
@@ -1361,7 +1180,7 @@ foreach (var trace in context.Traces)
 }
 ```
 
-### 7.5 在 Agent Tool 中封装 Pipeline
+### 7.7.5 在 Agent Tool 中封装 Pipeline
 
 ```csharp
 [AITool("run_pipeline")]
@@ -1424,7 +1243,7 @@ return context.Output;
 
 ## 7.9 数据流与上下文约定
 
-### 9.1 Input / Output / Next
+### 7.9.1 Input / Output / Next
 
 ```text
 初始：context.Input = 用户输入
@@ -1436,14 +1255,14 @@ return context.Output;
 最终：context.Output = 最后一步的输出
 ```
 
-### 9.2 Items 共享区
+### 7.9.2 Items 共享区
 
 - 用于存放结构化中间结果（如 `intent`、`plan`、`controller`）；
 - 分支判定：`ctx.Get<string>("intent") == "1"`；
 - 并行步骤：各自写入**不同 Key**，避免竞争；
 - 合并步骤：读取多个 Key 后 `Next` 给下游。
 
-### 9.3 并行步骤注意事项
+### 7.9.3 并行步骤注意事项
 
 | 规则 | 说明 |
 |---|---|
@@ -1471,7 +1290,7 @@ return context.Output;
 
 ### ❓ Q1：Pipeline 适合什么场景？
 
-`EasyCore.Pipeline` 是独立的轻量编排库，适用于单次请求内完成的多步骤流程：意图路由、分支处理、并行生成与 Trace 观测。无需 DI 注册，引用程序集后直接 `Pipeline.Create()` 即可使用。
+`EasyCore.Pipeline` 是独立的轻量编排库，适用于单次请求内完成的多步骤流程：意图路由、分支处理、并行生成与 Trace 观测。
 
 ### ❓ Q2：是否必须注册 DI？
 
@@ -1501,14 +1320,14 @@ Trace 中的 `StepName` 取自委托方法名（`func.Method.Name`）。匿名 l
 
 ## 7.12 EasyCore.Pipeline 详细介绍
 
-### 12.1 设计目标
+### 7.12.1 设计目标
 
 1. **轻量**：零外部依赖，API  surface 小，学习成本低；
 2. **可组合**：Func / Branch / Parallel 可任意嵌套；
 3. **可观测**：内置 Trace，无需额外 AOP；
 4. **Agent 友好**：与 `EasyCore.Agent` Tool 自然结合，一步一个 Agent 调用。
 
-### 12.2 类型结构
+### 7.12.2 类型结构
 
 ```
 EasyCore.Pipeline
@@ -1521,7 +1340,7 @@ EasyCore.Pipeline
 └── ParallelBuilder.cs    # 并行构建
 ```
 
-### 12.3 典型落地步骤
+### 7.12.3 典型落地步骤
 
 1. 引用 `EasyCore.Pipeline`；
 2. 定义各步骤方法（或 inline lambda）；
@@ -1535,13 +1354,13 @@ EasyCore.Pipeline
 
 ## 7.13 Demo 运行
 
-### 13.1 启动 Demo
+### 7.13.1 启动 Demo
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ```
 
-### 13.2 通过 Agent Tool 触发
+### 7.13.2 通过 Agent Tool 触发
 
 `PipelineTool` 注册了 `[AITool("get_workflow_test")]`，可通过 Agent 对话调用：
 
@@ -1588,60 +1407,17 @@ EasyCore.Agent（Agent SDK）
 
 ## 8.2 架构图
 
-### 2.1 组件关系图
+### 8.2.1 组件关系图
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core 应用"]
-        Controller["Controller / Service"]
-        Entity["RedisTextVector : RedisVectorRecord"]
-    end
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-b4df3e64.svg)
 
-    subgraph DI["依赖注入"]
-        Ext["EasyCoreRedis(...)"]
-        Options["RedisOptions"]
-        Multiplexer["IConnectionMultiplexer"]
-        Store["IRedisVectorStore"]
-    end
 
-    subgraph RedisStack["Redis Stack"]
-        Hash["Hash 文档存储<br/>{collection}:{id}"]
-        Index["RediSearch 索引<br/>{collection}:idx"]
-        KNN["KNN 向量检索"]
-        Filter["标量 Filter 查询"]
-    end
+### 8.2.2 一次向量检索时序
 
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Multiplexer
-    Ext --> Store
-    Store --> Hash
-    Store --> Index
-    Index --> KNN
-    Index --> Filter
-```
+![2-2-一次向量检索时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-一次向量检索时序-2124a1eb.svg)
 
-### 2.2 一次向量检索时序
 
-```mermaid
-sequenceDiagram
-    participant App as 业务代码
-    participant Store as RedisVectorStore
-    participant FT as RediSearch (FT)
-    participant DB as Redis Hash
-
-    App->>Store: VectorSearchAsync(collection, vectorName, vector, options)
-    Store->>Store: BuildFilterExpression(options.Filter)
-    Store->>Store: 构建 KNN Query (Dialect 2)
-    Store->>FT: SearchAsync(indexName, query)
-    FT->>DB: 扫描匹配 Hash + 向量距离计算
-    FT-->>Store: 返回 Document + score
-    Store->>Store: ConvertDistanceToScore + 阈值过滤
-    Store-->>App: List<RedisVectorSearchResult<TRecord>>
-```
-
-### 2.3 存储模型
+### 8.2.3 存储模型
 
 每个 Collection 在 Redis 中的组织方式：
 
@@ -1670,7 +1446,7 @@ sequenceDiagram
 
 ## 8.4 环境要求
 
-### 4.1 Redis 版本
+### 8.4.1 Redis 版本
 
 需要 **Redis Stack**（包含 RediSearch 与 Vector 模块），而非普通 Redis 单机版。
 
@@ -1681,11 +1457,11 @@ sequenceDiagram
 docker run -d --name redis-stack -p 6379:6379 redis/redis-stack:latest
 ```
 
-### 4.2 .NET 版本
+### 8.4.2 .NET 版本
 
 - .NET 8.0 及以上
 
-### 4.3 NuGet 依赖
+### 8.4.3 NuGet 依赖
 
 | 包 | 用途 |
 |---|---|
@@ -1697,19 +1473,13 @@ docker run -d --name redis-stack -p 6379:6379 redis/redis-stack:latest
 
 ## 8.5 快速开始
 
-### 5.1 安装包
+### 8.5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Vector.Redis
 ```
 
-或在解决方案中直接引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Redis\EasyCore.Vector.Redis.csproj" />
-```
-
-### 5.2 注册服务
+### 8.5.2 注册服务
 
 ```csharp
 using EasyCore.Vector.Redis;
@@ -1721,7 +1491,7 @@ builder.Services.EasyCoreRedis(options =>
 });
 ```
 
-### 5.3 定义向量实体
+### 8.5.3 定义向量实体
 
 ```csharp
 using EasyCore.Vector.Redis;
@@ -1737,7 +1507,7 @@ public sealed class RedisTextVector : RedisVectorRecord
 
 > `RedisVectorRecord` 已内置 `Id`、`Content`、`Vectors`，子类只需声明业务标量字段。
 
-### 5.4 创建 Collection 并写入数据
+### 8.5.4 创建 Collection 并写入数据
 
 ```csharp
 public class KnowledgeService
@@ -1795,7 +1565,7 @@ public class KnowledgeService
 }
 ```
 
-### 5.5 向量检索
+### 8.5.5 向量检索
 
 ```csharp
 var queryEmbedding = await embeddingClient.EmbedAsync("EasyCore.Agent 支持哪些功能？");
@@ -1821,7 +1591,7 @@ foreach (var item in results)
 
 ## 8.6 配置说明
 
-### 6.1 `RedisOptions`
+### 8.6.1 `RedisOptions`
 
 | 字段 | 类型 | 说明 | 示例 |
 |---|---|---|---|
@@ -1836,7 +1606,7 @@ localhost:6379,password=your_password
 redis.example.com:6379,ssl=true,abortConnect=false
 ```
 
-### 6.2 DI 生命周期
+### 8.6.2 DI 生命周期
 
 | 服务 | 生命周期 | 说明 |
 |---|---|---|
@@ -1848,7 +1618,7 @@ redis.example.com:6379,ssl=true,abortConnect=false
 
 ## 8.7 数据模型与 Collection 设计
 
-### 7.1 核心类型一览
+### 8.7.1 核心类型一览
 
 | 类型 | 说明 |
 |---|---|
@@ -1860,7 +1630,7 @@ redis.example.com:6379,ssl=true,abortConnect=false
 | `RedisVectorFilter` | 过滤条件容器 |
 | `RedisVectorSearchResult<TRecord>` | 检索结果（Record + Score） |
 
-### 7.2 内置字段
+### 8.7.2 内置字段
 
 创建 Collection 时，SDK 会自动追加以下字段，**无需**在业务定义中重复声明：
 
@@ -1869,7 +1639,7 @@ redis.example.com:6379,ssl=true,abortConnect=false
 | `Id` | `VarChar(128)` | 主键，对应 Redis Hash Key 后缀 |
 | `Content` | `VarChar(65535)` | 文本内容，可用于关键词过滤 |
 
-### 7.3 向量字段配置
+### 8.7.3 向量字段配置
 
 ```csharp
 new RedisVectorFieldDefinition
@@ -1891,7 +1661,7 @@ new RedisVectorFieldDefinition
 | `L2` | `L2` | `1 / (1 + distance)` |
 | `InnerProduct` | `IP` | `-distance` |
 
-### 7.4 标量字段类型
+### 8.7.4 标量字段类型
 
 | `ScalarFieldType` | RediSearch 映射 |
 |---|---|
@@ -1899,7 +1669,7 @@ new RedisVectorFieldDefinition
 | `String` / `VarChar` / `Json` | Text Field |
 | `Int8` ~ `Int64` / `Float` / `Double` | Numeric Field |
 
-### 7.5 命名约束
+### 8.7.5 命名约束
 
 Collection 名与字段名必须符合标识符规则：
 
@@ -1922,7 +1692,7 @@ IRedisVectorStore
               └── IRedisHybridSearch
 ```
 
-### 8.1 Collection 管理
+### 8.8.1 Collection 管理
 
 ```csharp
 // 检查 Collection 是否存在
@@ -1935,7 +1705,7 @@ await _vectorStore.CreateCollectionAsync("test_collection", definition);
 await _vectorStore.DeleteCollectionAsync("test_collection");
 ```
 
-### 8.2 写入与删除
+### 8.8.2 写入与删除
 
 ```csharp
 // 单条 Upsert
@@ -1948,7 +1718,7 @@ await _vectorStore.UpsertBatchAsync("test_collection", records);
 await _vectorStore.DeleteAsync("test_collection", recordId);
 ```
 
-### 8.3 按 Id 获取
+### 8.8.3 按 Id 获取
 
 ```csharp
 var record = await _vectorStore.GetAsync<RedisTextVector>(
@@ -1959,7 +1729,7 @@ var record = await _vectorStore.GetAsync<RedisTextVector>(
     includeMetadata: true);
 ```
 
-### 8.4 标量 Query（不含向量相似度）
+### 8.8.4 标量 Query（不含向量相似度）
 
 ```csharp
 var records = await _vectorStore.QueryAsync<RedisTextVector>(
@@ -1981,7 +1751,7 @@ var records = await _vectorStore.QueryAsync<RedisTextVector>(
     includeMetadata: true);
 ```
 
-### 8.5 向量检索（带 Filter）
+### 8.8.5 向量检索（带 Filter）
 
 ```csharp
 var options = new RedisVectorSearchOptions
@@ -2012,7 +1782,7 @@ var results = await _vectorStore.VectorSearchAsync<RedisTextVector>(
     options);
 ```
 
-### 8.6 混合检索（Hybrid Search）
+### 8.8.6 混合检索（Hybrid Search）
 
 Hybrid Search 适用于「语义相似 + 关键词命中」Combined Ranking 场景。BM25 候选可由 `QueryAsync` + `Contains` 等方式获得，再与向量结果融合：
 
@@ -2057,7 +1827,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync(
 
 融合算法会对向量分与 BM25 分分别归一化后加权求和，返回 Top-K 结果。
 
-### 8.7 同步 API
+### 8.8.7 同步 API
 
 所有 `Async` 方法均提供同步版本，例如：
 
@@ -2073,7 +1843,7 @@ var results = _vectorStore.VectorSearch<RedisTextVector>("test_collection", "con
 
 ## 8.9 过滤与检索能力详解
 
-### 9.1 支持的 Filter 运算符
+### 8.9.1 支持的 Filter 运算符
 
 | 运算符 | 说明 | 适用字段类型 | 示例 |
 |---|---|---|---|
@@ -2088,7 +1858,7 @@ var results = _vectorStore.VectorSearch<RedisTextVector>("test_collection", "con
 
 多个 Condition 之间为 **AND** 关系（空格连接）。`In` 运算符内部为 OR。
 
-### 9.2 `RedisVectorSearchOptions` 参数
+### 8.9.2 `RedisVectorSearchOptions` 参数
 
 | 字段 | 默认值 | 说明 |
 |---|---|---|
@@ -2099,7 +1869,7 @@ var results = _vectorStore.VectorSearch<RedisTextVector>("test_collection", "con
 | `IncludeVector` | `false` | 是否在结果中包含向量数据 |
 | `IncludeMetadata` | `true` | 是否包含自定义标量字段 |
 
-### 9.3 向量检索执行流程
+### 8.9.3 向量检索执行流程
 
 1. 根据 `Filter` 构建 RediSearch 过滤表达式；
 2. 拼接 KNN 子句：`(filter)=>[KNN {Limit} @{vectorName} $queryVector AS score]`；
@@ -2222,7 +1992,7 @@ Collection 名、字段名必须符合 `^[A-Za-z_][A-Za-z0-9_]*$`，请勿使用
 
 ## 8.13 EasyCore.Vector.Redis 详细介绍
 
-### 13.1 设计目标
+### 8.13.1 设计目标
 
 `EasyCore.Vector.Redis` 的核心目标是：在 .NET 应用中提供**生产可用**的 Redis 向量存储封装，并与 EasyCore 其他向量后端保持 API 一致，使 RAG 业务代码可以跨存储引擎迁移。
 
@@ -2233,7 +2003,7 @@ Collection 名、字段名必须符合 `^[A-Za-z_][A-Za-z0-9_]*$`，请勿使用
 3. **检索表达**：屏蔽 RediSearch KNN + Filter 语法细节；
 4. **可组合性**：向量检索、标量 Query、Hybrid 融合分层接口，便于扩展。
 
-### 13.2 接口分层
+### 8.13.2 接口分层
 
 ```
 IRedisHybridSearch
@@ -2251,7 +2021,7 @@ IRedisVectorStore : IVectorStore
   └── （标记接口，DI 注入使用）
 ```
 
-### 13.3 典型落地步骤
+### 8.13.3 典型落地步骤
 
 1. 部署 Redis Stack，配置 `ConnectionString`；
 2. 调用 `EasyCoreRedis` 注册 DI；
@@ -2262,7 +2032,7 @@ IRedisVectorStore : IVectorStore
 7. 结合 `EasyCore.Agent.RAG` 做 MMR / Rerank；
 8. 将召回内容注入 Agent 上下文生成答案。
 
-### 13.4 与其他向量后端对比（选型参考）
+### 8.13.4 与其他向量后端对比（选型参考）
 
 | 维度 | Redis | 说明 |
 |---|---|---|
@@ -2278,19 +2048,19 @@ IRedisVectorStore : IVectorStore
 
 仓库内置 `AspCoreAgent` Demo，包含完整的 Redis 向量库 API 示例。
 
-### 14.1 启动 Redis Stack
+### 8.14.1 启动 Redis Stack
 
 ```bash
 docker run -d --name redis-stack -p 6379:6379 redis/redis-stack:latest
 ```
 
-### 14.2 启动 Demo
+### 8.14.2 启动 Demo
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ```
 
-### 14.3 相关 API 端点
+### 8.14.3 相关 API 端点
 
 | 端点 | 说明 |
 |---|---|
@@ -2309,6 +2079,7 @@ dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ---
 
 ## 9. EasyCore.Vector.Qdrant
+
 ### 9.1 项目简介
 
 ### 🎯 解决什么问题？
@@ -2350,71 +2121,17 @@ EasyCore.Agent（Agent SDK）
 
 ## 9.2 架构图
 
-### 2.1 组件关系图
+### 9.2.1 组件关系图
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core 应用"]
-        Controller["Controller / Service"]
-        Entity["QdrantTextVector : QdrantVectorRecord"]
-    end
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-33cf79de.svg)
 
-    subgraph DI["依赖注入"]
-        Ext["EasyCoreQdrant(...)"]
-        Options["QdrantOptions"]
-        Client["QdrantClient"]
-        Store["IQdrantVectorStore"]
-    end
 
-    subgraph QdrantServer["Qdrant Server (gRPC :6334)"]
-        Collection["Collection<br/>Named Dense + Sparse Vectors"]
-        Payload["Point Payload<br/>content / metadata / record"]
-        DenseSearch["稠密向量 ANN 检索"]
-        SparseSearch["稀疏向量检索"]
-        Filter["Payload Filter"]
-    end
+### 9.2.2 混合检索时序（Dense + Sparse）
 
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Client
-    Ext --> Store
-    Store --> Client
-    Client --> Collection
-    Collection --> Payload
-    Collection --> DenseSearch
-    Collection --> SparseSearch
-    DenseSearch --> Filter
-    SparseSearch --> Filter
-```
+![2-2-混合检索时序-dense-sparse](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-混合检索时序-dense-sparse-840ad150.svg)
 
-### 2.2 混合检索时序（Dense + Sparse）
 
-```mermaid
-sequenceDiagram
-    participant App as 业务代码
-    participant Store as QdrantVectorStore
-    participant QC as Qdrant gRPC Client
-    participant DB as Qdrant Collection
-
-    App->>Store: HybridSearchAsync(denseVector, sparseVector, denseWeight, sparseWeight)
-    Store->>Store: candidateLimit = Limit × 3
-    par 并行召回
-        Store->>QC: VectorSearchAsync (稠密向量)
-        QC->>DB: ANN Search (dense)
-        DB-->>QC: dense results + score
-        QC-->>Store: dense results
-    and
-        Store->>QC: SparseSearchAsync (稀疏向量)
-        QC->>DB: Sparse Search (indices + values)
-        DB-->>QC: sparse results + score
-        QC-->>Store: sparse results
-    end
-    Store->>Store: 按 Id 合并 + 分数归一化 + 加权求和
-    Store-->>App: List<QdrantQdrantVectorSearchResult<TRecord>>
-```
-
-### 2.3 存储模型
+### 9.2.3 存储模型
 
 每个 Collection 在 Qdrant 中的组织方式：
 
@@ -2444,7 +2161,7 @@ sequenceDiagram
 
 ## 9.4 环境要求
 
-### 4.1 Qdrant 版本
+### 9.4.1 Qdrant 版本
 
 需要运行 **Qdrant Server**（支持 Sparse Vector 的版本，推荐 1.7+）。
 
@@ -2457,11 +2174,11 @@ docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 > SDK 默认通过 **gRPC 端口 6334** 通信（非 HTTP 6333）。
 
-### 4.2 .NET 版本
+### 9.4.2 .NET 版本
 
 - .NET 8.0 及以上
 
-### 4.3 NuGet 依赖
+### 9.4.3 NuGet 依赖
 
 | 包 | 版本 | 用途 |
 |---|---|---|
@@ -2472,19 +2189,13 @@ docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 ## 9.5 快速开始
 
-### 5.1 安装包
+### 9.5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Vector.Qdrant
 ```
 
-或在解决方案中直接引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Qdrant\EasyCore.Vector.Qdrant.csproj" />
-```
-
-### 5.2 注册服务
+### 9.5.2 注册服务
 
 ```csharp
 using EasyCore.Vector.Qdrant;
@@ -2498,7 +2209,7 @@ builder.Services.EasyCoreQdrant(options =>
 });
 ```
 
-### 5.3 定义向量实体
+### 9.5.3 定义向量实体
 
 ```csharp
 using EasyCore.Vector.Qdrant;
@@ -2514,7 +2225,7 @@ public sealed class QdrantTextVector : QdrantVectorRecord
 
 > `QdrantVectorRecord` 已内置 `Id`、`Content`、`Vectors`、`Metadata`，子类只需声明业务标量字段。标量属性会在 Upsert 时自动反射写入 Payload，供 Filter 使用。
 
-### 5.4 创建 Collection 并写入数据
+### 9.5.4 创建 Collection 并写入数据
 
 ```csharp
 using Qdrant.Client.Grpc;
@@ -2560,7 +2271,7 @@ public class KnowledgeService
 }
 ```
 
-### 5.5 稠密向量检索
+### 9.5.5 稠密向量检索
 
 ```csharp
 var queryEmbedding = await embeddingClient.EmbedAsync("EasyCore.Agent 支持哪些功能？");
@@ -2582,7 +2293,7 @@ foreach (var item in results)
 }
 ```
 
-### 5.6 稀疏向量检索
+### 9.5.6 稀疏向量检索
 
 ```csharp
 var sparseQuery = new SparseVectorValue
@@ -2598,7 +2309,7 @@ var sparseResults = await _vectorStore.SparseSearchAsync<QdrantTextVector>(
     options: new QdrantVectorSearchOptions { Limit = 10 });
 ```
 
-### 5.7 混合检索（Dense + Sparse）
+### 9.5.7 混合检索（Dense + Sparse）
 
 ```csharp
 var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
@@ -2616,7 +2327,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
 
 ## 9.6 配置说明
 
-### 6.1 `QdrantOptions`
+### 9.6.1 `QdrantOptions`
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
@@ -2625,7 +2336,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
 | `ApiKey` | `string?` | `null` | API Key（Qdrant Cloud 等认证场景） |
 | `UseHttps` | `bool` | `false` | 是否使用 HTTPS 连接 |
 
-### 6.2 DI 生命周期
+### 9.6.2 DI 生命周期
 
 | 服务 | 生命周期 | 说明 |
 |---|---|---|
@@ -2637,7 +2348,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
 
 ## 9.7 数据模型与 Collection 设计
 
-### 7.1 核心类型一览
+### 9.7.1 核心类型一览
 
 | 类型 | 说明 |
 |---|---|
@@ -2649,7 +2360,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
 | `QdrantVectorFilter` | 过滤条件容器 |
 | `QdrantQdrantVectorSearchResult<TRecord>` | 检索结果（Record + Score） |
 
-### 7.2 内置字段
+### 9.7.2 内置字段
 
 每条记录在 Payload 中自动包含：
 
@@ -2661,7 +2372,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
 
 业务标量属性（如 `DocumentId`、`Index`）会同时作为独立 Payload 字段写入，可直接用于 Filter。
 
-### 7.3 向量字段配置
+### 9.7.3 向量字段配置
 
 ```csharp
 new QdrantVectorFieldDefinition
@@ -2694,7 +2405,7 @@ new QdrantVectorFieldDefinition
 
 例如：`contentVector` → `contentVector_sparse`
 
-### 7.4 命名约束
+### 9.7.4 命名约束
 
 - Collection 名不能为空或纯空白字符；
 - 向量字段名不能为空；
@@ -2717,7 +2428,7 @@ IQdrantVectorStore
 > **注意**：`IVectorStore` **不包含** `GetAsync` / `QueryAsync` 方法。  
 > 本库仅提供 Collection 管理（Create / Delete / Exists）、写入（Upsert / UpsertBatch）、删除（Delete）以及检索接口（VectorSearch / SparseSearch / HybridSearch）。
 
-### 8.1 Collection 管理
+### 9.8.1 Collection 管理
 
 ```csharp
 // 检查 Collection 是否存在
@@ -2730,7 +2441,7 @@ await _vectorStore.CreateCollectionAsync("test_collection", definition);
 await _vectorStore.DeleteCollectionAsync("test_collection");
 ```
 
-### 8.2 写入与删除
+### 9.8.2 写入与删除
 
 ```csharp
 // 单条 Upsert
@@ -2743,7 +2454,7 @@ await _vectorStore.UpsertBatchAsync("test_collection", records);
 await _vectorStore.DeleteAsync("test_collection", recordId);
 ```
 
-### 8.3 稠密向量检索（带 Filter）
+### 9.8.3 稠密向量检索（带 Filter）
 
 ```csharp
 var options = new QdrantVectorSearchOptions
@@ -2773,7 +2484,7 @@ var results = await _vectorStore.VectorSearchAsync<QdrantTextVector>(
     options);
 ```
 
-### 8.4 稀疏向量检索
+### 9.8.4 稀疏向量检索
 
 稀疏向量由 **索引（Indices）** 与 **权重（Values）** 组成，长度必须一致：
 
@@ -2807,7 +2518,7 @@ var results = await _vectorStore.SparseSearchAsync<QdrantTextVector>(
     });
 ```
 
-### 8.5 混合检索（Dense + Sparse 加权融合）
+### 9.8.5 混合检索（Dense + Sparse 加权融合）
 
 与 Redis 后端的 Hybrid Search（向量 + BM25 候选融合）不同，Qdrant 后端在 SDK 层同时执行 **稠密向量检索** 与 **稀疏向量检索**，再按权重合并：
 
@@ -2831,7 +2542,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync<QdrantTextVector>(
 4. 加权求和：`Score = normDense × denseWeight + normSparse × sparseWeight`；
 5. 按最终 Score 降序返回 Top-K。
 
-### 8.6 同步 API
+### 9.8.6 同步 API
 
 所有 `Async` 方法均提供同步版本，例如：
 
@@ -2850,7 +2561,7 @@ var hybridResults = _vectorStore.HybridSearch<QdrantTextVector>(
 
 ## 9.9 过滤与检索能力详解
 
-### 9.1 支持的 Filter 运算符
+### 9.9.1 支持的 Filter 运算符
 
 | 运算符 | 说明 | 适用字段类型 | 示例 |
 |---|---|---|---|
@@ -2865,7 +2576,7 @@ var hybridResults = _vectorStore.HybridSearch<QdrantTextVector>(
 
 多个 Condition 之间为 **AND** 关系（`Must` 连接）。`NotEqual` 映射为 `MustNot`。`In` 运算符内部为 OR。
 
-### 9.2 `QdrantVectorSearchOptions` 参数
+### 9.9.2 `QdrantVectorSearchOptions` 参数
 
 | 字段 | 默认值 | 说明 |
 |---|---|---|
@@ -2877,7 +2588,7 @@ var hybridResults = _vectorStore.HybridSearch<QdrantTextVector>(
 
 > 与 Redis 后端不同，**无 `MetricType` 字段**——距离度量由 Collection 创建时的 `QdrantVectorFieldDefinition.Distance` 决定。
 
-### 9.3 稠密向量检索执行流程
+### 9.9.3 稠密向量检索执行流程
 
 1. 根据 `Filter` 构建 Qdrant Payload Filter；
 2. 调用 `QdrantClient.SearchAsync`，指定 Named Vector 与查询向量；
@@ -2886,7 +2597,7 @@ var hybridResults = _vectorStore.HybridSearch<QdrantTextVector>(
 5. 反序列化 Payload 中的 `record` JSON 为强类型 `TRecord`；
 6. 按 Score 降序返回最多 `Limit` 条。
 
-### 9.4 稀疏向量检索执行流程
+### 9.9.4 稀疏向量检索执行流程
 
 1. 校验 `SparseVectorValue.Indices` 与 `Values` 长度一致；
 2. 构建 Payload Filter（可选）；
@@ -3024,7 +2735,7 @@ Qdrant 后端聚焦于向量写入与相似度检索。按 Id 获取或纯标量
 
 ## 9.13 EasyCore.Vector.Qdrant 详细介绍
 
-### 13.1 设计目标
+### 9.13.1 设计目标
 
 `EasyCore.Vector.Qdrant` 的核心目标是：在 .NET 应用中提供**生产可用**的 Qdrant 向量存储封装，并与 EasyCore 其他向量后端保持 API 一致，使 RAG 业务代码可以跨存储引擎迁移。
 
@@ -3035,7 +2746,7 @@ Qdrant 后端聚焦于向量写入与相似度检索。按 Id 获取或纯标量
 3. **检索表达**：屏蔽 Qdrant gRPC Filter 与 Named Vector 语法细节；
 4. **差异化检索**：稀疏向量检索与 Dense+Sparse 混合检索一等公民支持。
 
-### 13.2 接口分层
+### 9.13.2 接口分层
 
 ```
 IQdrantHybridSearch
@@ -3057,7 +2768,7 @@ IQdrantVectorStore : IVectorStore
   └── （标记接口，DI 注入使用）
 ```
 
-### 13.3 典型落地步骤
+### 9.13.3 典型落地步骤
 
 1. 部署 Qdrant Server，确认 gRPC 6334 可访问；
 2. 调用 `EasyCoreQdrant` 注册 DI；
@@ -3068,7 +2779,7 @@ IQdrantVectorStore : IVectorStore
 7. 结合 `EasyCore.Agent.RAG` 做 MMR / Rerank；
 8. 将召回内容注入 Agent 上下文生成答案。
 
-### 13.4 与其他向量后端对比（选型参考）
+### 9.13.4 与其他向量后端对比（选型参考）
 
 | 维度 | Qdrant | 说明 |
 |---|---|---|
@@ -3085,13 +2796,13 @@ IQdrantVectorStore : IVectorStore
 
 仓库内置 `AspCoreAgent` Demo，包含完整的 Qdrant 向量库 API 示例。
 
-### 14.1 启动 Qdrant
+### 9.14.1 启动 Qdrant
 
 ```bash
 docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 ```
 
-### 14.2 启动 Demo
+### 9.14.2 启动 Demo
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
@@ -3107,7 +2818,7 @@ builder.Services.EasyCoreQdrant(options =>
 });
 ```
 
-### 14.3 相关 API 端点
+### 9.14.3 相关 API 端点
 
 | 端点 | 说明 |
 |---|---|
@@ -3127,6 +2838,7 @@ Demo 实体定义见 `demo/AspCoreAgent/VectorEntity/QdrantTextVector.cs`。
 ---
 
 ## 10. EasyCore.Vector.Milvus
+
 ### 10.1 项目简介
 
 **EasyCore.Vector.Milvus** 封装 Milvus 底层 SDK，提供与 EasyCore 其他向量后端一致的强类型 API，适用于大规模向量检索与 RAG 知识库场景。
@@ -3142,13 +2854,8 @@ EasyCore.Agent → EasyCore.Agent.RAG → EasyCore.Vector.*
 
 ## 10.2 架构图
 
-```mermaid
-flowchart TB
-    App["ASP.NET Core"] --> Store["IMilvusVectorStore"]
-    Store --> Client["MilvusClient (gRPC)"]
-    Client --> Milvus["Milvus Server"]
-    Milvus --> Collection["Collection + Index"]
-```
+![2-架构图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-架构图-ef6518fd.svg)
+
 
 ---
 
@@ -3179,7 +2886,7 @@ docker run -d --name milvus -p 19530:19530 -p 9091:9091 milvusdb/milvus:latest s
 
 ## 10.5 快速开始
 
-### 5.1 注册服务
+### 10.5.1 注册服务
 
 ```csharp
 builder.Services.EasyCoreMilvus(options =>
@@ -3193,7 +2900,7 @@ builder.Services.EasyCoreMilvus(options =>
 });
 ```
 
-### 5.2 定义实体
+### 10.5.2 定义实体
 
 ```csharp
 public sealed class MilvusTextVector : MilvusVectorRecord
@@ -3205,7 +2912,7 @@ public sealed class MilvusTextVector : MilvusVectorRecord
 }
 ```
 
-### 5.3 创建 Collection 并检索
+### 10.5.3 创建 Collection 并检索
 
 ```csharp
 var definition = new MilvusVectorCollectionDefinition
@@ -3242,7 +2949,7 @@ var results = await _vectorStore.VectorSearchAsync<MilvusTextVector>(
 
 ## 10.6 配置说明
 
-### 6.1 `MilvusOptions`
+### 10.6.1 `MilvusOptions`
 
 | 字段 | 默认值 | 说明 |
 |---|---|---|
@@ -3253,7 +2960,7 @@ var results = await _vectorStore.VectorSearchAsync<MilvusTextVector>(
 | `Token` | — | Token 认证 |
 | `UseTls` | `false` | 是否启用 TLS |
 
-### 6.2 DI 生命周期
+### 10.6.2 DI 生命周期
 
 | 服务 | 生命周期 |
 |---|---|
@@ -3265,7 +2972,7 @@ var results = await _vectorStore.VectorSearchAsync<MilvusTextVector>(
 
 ## 10.7 数据模型与 Collection 设计
 
-### 7.1 向量索引类型
+### 10.7.1 向量索引类型
 
 | `MilvusVectorIndexType` | 说明 |
 |---|---|
@@ -3277,11 +2984,11 @@ var results = await _vectorStore.VectorSearchAsync<MilvusTextVector>(
 
 HNSW 参数：`M`（默认 16）、`EfConstruction`（默认 200）；IVF 参数：`NList`（默认 1024）。
 
-### 7.2 内置字段
+### 10.7.2 内置字段
 
 自动追加 `Id`（VarChar 主键）、`Content`（VarChar），无需重复声明。
 
-### 7.3 命名约束
+### 10.7.3 命名约束
 
 Collection 与字段名须符合：`^[A-Za-z_][A-Za-z0-9_]*$`
 
@@ -3289,7 +2996,7 @@ Collection 与字段名须符合：`^[A-Za-z_][A-Za-z0-9_]*$`
 
 ## 10.8 API 使用示例
 
-### 8.1 Collection 管理
+### 10.8.1 Collection 管理
 
 ```csharp
 await _vectorStore.CreateCollectionAsync("test_collection", definition);
@@ -3297,7 +3004,7 @@ var exists = await _vectorStore.CollectionExistsAsync("test_collection");
 await _vectorStore.DeleteCollectionAsync("test_collection");
 ```
 
-### 8.2 写入与删除
+### 10.8.2 写入与删除
 
 ```csharp
 await _vectorStore.UpsertAsync("test_collection", record);
@@ -3305,7 +3012,7 @@ await _vectorStore.UpsertBatchAsync("test_collection", records);
 await _vectorStore.DeleteAsync("test_collection", id);
 ```
 
-### 8.3 Get / Query
+### 10.8.3 Get / Query
 
 ```csharp
 var record = await _vectorStore.GetAsync<MilvusTextVector>(
@@ -3320,7 +3027,7 @@ var records = await _vectorStore.QueryAsync<MilvusTextVector>(
     limit: 10);
 ```
 
-### 8.4 向量检索（带 Filter）
+### 10.8.4 向量检索（带 Filter）
 
 ```csharp
 var options = new MilvusVectorSearchOptions
@@ -3335,7 +3042,7 @@ var results = await _vectorStore.VectorSearchAsync<MilvusTextVector>(
     "test_collection", "contentVector", queryVector, options);
 ```
 
-### 8.5 Hybrid Search
+### 10.8.5 Hybrid Search
 
 ```csharp
 var hybridResults = await _vectorStore.HybridSearchAsync(
@@ -3356,16 +3063,8 @@ Milvus 写入后数据在 growing segment，检索前需 Load 到内存。
 | `LoadAsync(collectionName)` | 将 Collection 加载到 Query Node 内存 |
 | `ReleaseAsync(collectionName)` | 从内存释放 Collection |
 
-```mermaid
-stateDiagram-v2
-    [*] --> Created: CreateCollection
-    Created --> Growing: Upsert
-    Growing --> Sealed: FlushAsync
-    Sealed --> Loaded: LoadAsync
-    Loaded --> Searching: VectorSearch
-    Loaded --> Released: ReleaseAsync
-    Released --> Loaded: LoadAsync
-```
+![9-milvus-生命周期管理](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/9-milvus-生命周期管理-0e62eac8.svg)
+
 
 > 向量检索内部会自动调用 `LoadAsync`；大批量写入后建议显式 `FlushAsync`。
 
@@ -3373,11 +3072,11 @@ stateDiagram-v2
 
 ## 10.10 过滤与检索能力详解
 
-### 10.1 Filter 运算符
+### 10.10.1 Filter 运算符
 
 `Equal`、`NotEqual`、`GreaterThan`、`GreaterThanOrEqual`、`LessThan`、`LessThanOrEqual`、`Contains`、`In`
 
-### 10.2 `MilvusVectorSearchOptions`
+### 10.10.2 `MilvusVectorSearchOptions`
 
 | 字段 | 默认值 | 说明 |
 |---|---|---|
@@ -3458,6 +3157,7 @@ dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ---
 
 ## 11. EasyCore.Vector.PostgreSQL
+
 ### 11.1 项目简介
 
 ### 🎯 解决什么问题？
@@ -3489,62 +3189,17 @@ EasyCore.Agent（Agent SDK）
 
 ## 11.2 架构图
 
-### 2.1 组件关系图
+### 11.2.1 组件关系图
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core 应用"]
-        Controller["Controller / Service"]
-        Entity["PostgreSqlTextVector : PostgreSqlVectorRecord"]
-    end
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-c7ad4952.svg)
 
-    subgraph DI["依赖注入"]
-        Ext["EasyCorePostgreSql(...)"]
-        Options["PostgreSqlOptions"]
-        DataSource["NpgsqlDataSource + UseVector()"]
-        Store["IPostgreSqlVectorStore"]
-    end
 
-    subgraph PostgreSQL["PostgreSQL + pgvector"]
-        Ext2["vector 扩展"]
-        Table["Collection 表<br/>public.{collection}"]
-        Index["HNSW / IVFFlat 向量索引"]
-        KNN["向量距离运算<br/><=> / <-> / <#>"]
-        Filter["SQL WHERE 标量过滤"]
-    end
+### 11.2.2 一次向量检索时序
 
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Store
-    Store --> DataSource
-    DataSource --> Ext2
-    Store --> Table
-    Store --> Index
-    Table --> KNN
-    Table --> Filter
-```
+![2-2-一次向量检索时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-一次向量检索时序-1d64b161.svg)
 
-### 2.2 一次向量检索时序
 
-```mermaid
-sequenceDiagram
-    participant App as 业务代码
-    participant Store as PostgreSqlVectorStore
-    participant PG as PostgreSQL (pgvector)
-    participant Table as Collection 表
-
-    App->>Store: VectorSearchAsync(collection, vectorName, vector, options)
-    Store->>Store: BuildFilterSql(options.Filter)
-    Store->>Store: 构建 Score 表达式 (Cosine/L2/IP)
-    Store->>PG: 执行参数化 SELECT + ORDER BY score DESC
-    PG->>Table: 扫描行 + 向量距离计算
-    PG-->>Store: 返回行 + score
-    Store->>Store: ScoreThreshold 过滤
-    Store-->>App: List<PostgreSqlVectorSearchResult<TRecord>>
-```
-
-### 2.3 存储模型
+### 11.2.3 存储模型
 
 每个 Collection 在 PostgreSQL 中的组织方式：
 
@@ -3590,7 +3245,7 @@ USING hnsw ("documentVector" vector_cosine_ops);
 
 ## 11.4 环境要求
 
-### 4.1 PostgreSQL 与 pgvector
+### 11.4.1 PostgreSQL 与 pgvector
 
 需要 **PostgreSQL 数据库** 并安装 **pgvector 扩展**。
 
@@ -3645,11 +3300,11 @@ docker exec -it pgvector psql -U postgres -d vector_db -c "CREATE EXTENSION IF N
 docker exec -it pgvector psql -U postgres -d vector_db -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
 ```
 
-### 4.2 .NET 版本
+### 11.4.2 .NET 版本
 
 - .NET 8.0 及以上
 
-### 4.3 NuGet 依赖
+### 11.4.3 NuGet 依赖
 
 | 包 | 版本 | 用途 |
 |---|---|---|
@@ -3661,19 +3316,13 @@ docker exec -it pgvector psql -U postgres -d vector_db -c "SELECT extname, extve
 
 ## 11.5 快速开始
 
-### 5.1 安装包
+### 11.5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Vector.PostgreSQL
 ```
 
-或在解决方案中直接引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.PostgreSQL\EasyCore.Vector.PostgreSQL.csproj" />
-```
-
-### 5.2 注册服务
+### 11.5.2 注册服务
 
 ```csharp
 using EasyCore.Vector.PostgreSQL;
@@ -3685,7 +3334,7 @@ builder.Services.EasyCorePostgreSql(options =>
 });
 ```
 
-### 5.3 定义向量实体
+### 11.5.3 定义向量实体
 
 ```csharp
 using EasyCore.Vector.PostgreSQL;
@@ -3701,7 +3350,7 @@ public sealed class PostgreSqlTextVector : PostgreSqlVectorRecord
 
 > `PostgreSqlVectorRecord` 已内置 `Id`、`Content`、`Vectors`，子类只需声明业务标量字段。
 
-### 5.4 创建 Collection 并写入数据
+### 11.5.4 创建 Collection 并写入数据
 
 ```csharp
 public class KnowledgeService
@@ -3759,7 +3408,7 @@ public class KnowledgeService
 }
 ```
 
-### 5.5 向量检索
+### 11.5.5 向量检索
 
 ```csharp
 var queryEmbedding = await embeddingClient.EmbedAsync("EasyCore.Agent 支持哪些功能？");
@@ -3785,7 +3434,7 @@ foreach (var item in results)
 
 ## 11.6 配置说明
 
-### 6.1 `PostgreSqlOptions`
+### 11.6.1 `PostgreSqlOptions`
 
 | 字段 | 类型 | 说明 | 示例 |
 |---|---|---|---|
@@ -3810,7 +3459,7 @@ Host=db.example.com;Port=5432;Database=vector_db;Username=app;Password=secret;SS
 | `Pooling` | 连接池，默认开启 |
 | `Timeout` | 连接超时（秒） |
 
-### 6.2 DI 生命周期
+### 11.6.2 DI 生命周期
 
 | 服务 | 生命周期 | 说明 |
 |---|---|---|
@@ -3821,7 +3470,7 @@ Host=db.example.com;Port=5432;Database=vector_db;Username=app;Password=secret;SS
 
 ## 11.7 数据模型与 Collection 设计
 
-### 7.1 核心类型一览
+### 11.7.1 核心类型一览
 
 | 类型 | 说明 |
 |---|---|
@@ -3833,7 +3482,7 @@ Host=db.example.com;Port=5432;Database=vector_db;Username=app;Password=secret;SS
 | `PostgreSqlVectorFilter` | 过滤条件容器 |
 | `PostgreSqlVectorSearchResult<TRecord>` | 检索结果（Record + Score） |
 
-### 7.2 内置字段
+### 11.7.2 内置字段
 
 创建 Collection 时，SDK 会自动追加以下字段，**无需**在业务定义中重复声明：
 
@@ -3842,7 +3491,7 @@ Host=db.example.com;Port=5432;Database=vector_db;Username=app;Password=secret;SS
 | `Id` | `VARCHAR(128) PRIMARY KEY` | 主键，Upsert 冲突键 |
 | `Content` | `VARCHAR(65535)` | 文本内容，可用于关键词过滤 |
 
-### 7.3 向量字段配置
+### 11.7.3 向量字段配置
 
 ```csharp
 new PostgreSqlVectorFieldDefinition
@@ -3879,7 +3528,7 @@ new PostgreSqlVectorFieldDefinition
 | `L2` | `vector_l2_ops` |
 | `InnerProduct` | `vector_ip_ops` |
 
-### 7.4 标量字段类型
+### 11.7.4 标量字段类型
 
 | `ScalarFieldType` | PostgreSQL 映射 |
 |---|---|
@@ -3892,7 +3541,7 @@ new PostgreSqlVectorFieldDefinition
 | `String` / `VarChar` | `TEXT` / `VARCHAR(n)` |
 | `Json` | `JSONB` |
 
-### 7.5 命名约束
+### 11.7.5 命名约束
 
 Collection 名与字段名必须符合标识符规则：
 
@@ -3917,7 +3566,7 @@ IPostgreSqlVectorStore
               └── IPostgreSqlHybridSearch
 ```
 
-### 8.1 Collection 管理
+### 11.8.1 Collection 管理
 
 ```csharp
 // 检查 Collection 是否存在（查询 public schema 下对应表）
@@ -3930,7 +3579,7 @@ await _vectorStore.CreateCollectionAsync("test_collection", definition);
 await _vectorStore.DeleteCollectionAsync("test_collection");
 ```
 
-### 8.2 写入与删除
+### 11.8.2 写入与删除
 
 ```csharp
 // 单条 Upsert（ON CONFLICT DO UPDATE）
@@ -3943,7 +3592,7 @@ await _vectorStore.UpsertBatchAsync("test_collection", records);
 await _vectorStore.DeleteAsync("test_collection", recordId);
 ```
 
-### 8.3 按 Id 获取
+### 11.8.3 按 Id 获取
 
 ```csharp
 var record = await _vectorStore.GetAsync<PostgreSqlTextVector>(
@@ -3954,7 +3603,7 @@ var record = await _vectorStore.GetAsync<PostgreSqlTextVector>(
     includeMetadata: true);
 ```
 
-### 8.4 标量 Query（不含向量相似度）
+### 11.8.4 标量 Query（不含向量相似度）
 
 ```csharp
 var records = await _vectorStore.QueryAsync<PostgreSqlTextVector>(
@@ -3976,7 +3625,7 @@ var records = await _vectorStore.QueryAsync<PostgreSqlTextVector>(
     includeMetadata: true);
 ```
 
-### 8.5 向量检索（带 Filter）
+### 11.8.5 向量检索（带 Filter）
 
 ```csharp
 var options = new PostgreSqlVectorSearchOptions
@@ -4007,7 +3656,7 @@ var results = await _vectorStore.VectorSearchAsync<PostgreSqlTextVector>(
     options);
 ```
 
-### 8.6 混合检索（Hybrid Search）
+### 11.8.6 混合检索（Hybrid Search）
 
 Hybrid Search 适用于「语义相似 + 关键词命中」Combined Ranking 场景。BM25 候选可由 `QueryAsync` + `Contains` 等方式获得，再与向量结果融合：
 
@@ -4052,7 +3701,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync(
 
 融合算法会对向量分与 BM25 分分别归一化后加权求和，返回 Top-K 结果。
 
-### 8.7 同步 API
+### 11.8.7 同步 API
 
 所有 `Async` 方法均提供同步版本，例如：
 
@@ -4068,7 +3717,7 @@ var results = _vectorStore.VectorSearch<PostgreSqlTextVector>("test_collection",
 
 ## 11.9 过滤与检索能力详解
 
-### 9.1 支持的 Filter 运算符
+### 11.9.1 支持的 Filter 运算符
 
 | 运算符 | 说明 | 适用字段类型 | SQL 实现 |
 |---|---|---|---|
@@ -4083,7 +3732,7 @@ var results = _vectorStore.VectorSearch<PostgreSqlTextVector>("test_collection",
 
 多个 Condition 之间为 **AND** 关系。`In` 运算符内部为 OR 语义（`= ANY` 数组）。
 
-### 9.2 `PostgreSqlVectorSearchOptions` 参数
+### 11.9.2 `PostgreSqlVectorSearchOptions` 参数
 
 | 字段 | 默认值 | 说明 |
 |---|---|---|
@@ -4094,7 +3743,7 @@ var results = _vectorStore.VectorSearch<PostgreSqlTextVector>("test_collection",
 | `IncludeVector` | `false` | 是否在结果中包含向量数据 |
 | `IncludeMetadata` | `true` | 是否包含自定义标量字段 |
 
-### 9.3 向量检索执行流程
+### 11.9.3 向量检索执行流程
 
 1. 根据 `Filter` 构建参数化 `WHERE` 子句；
 2. 在内层子查询中计算 Score 表达式（基于 pgvector 距离运算符）；
@@ -4228,7 +3877,7 @@ Collection 名、字段名必须符合 `^[A-Za-z_][A-Za-z0-9_]*$`，请勿使用
 
 ## 11.13 EasyCore.Vector.PostgreSQL 详细介绍
 
-### 13.1 设计目标
+### 11.13.1 设计目标
 
 `EasyCore.Vector.PostgreSQL` 的核心目标是：在 .NET 应用中提供**生产可用**的 PostgreSQL 向量存储封装，并与 EasyCore 其他向量后端保持 API 一致，使 RAG 业务代码可以跨存储引擎迁移。
 
@@ -4239,7 +3888,7 @@ Collection 名、字段名必须符合 `^[A-Za-z_][A-Za-z0-9_]*$`，请勿使用
 3. **检索表达**：屏蔽 pgvector 距离运算符与参数化 SQL 拼接细节；
 4. **可组合性**：向量检索、标量 Query、Hybrid 融合分层接口，便于扩展。
 
-### 13.2 接口分层
+### 11.13.2 接口分层
 
 ```
 IPostgreSqlHybridSearch
@@ -4257,7 +3906,7 @@ IPostgreSqlVectorStore : IVectorStore
   └── （标记接口，DI 注入使用）
 ```
 
-### 13.3 典型落地步骤
+### 11.13.3 典型落地步骤
 
 1. 部署 PostgreSQL + pgvector（Docker 或云托管），配置 `ConnectionString`；
 2. 调用 `EasyCorePostgreSql` 注册 DI；
@@ -4268,7 +3917,7 @@ IPostgreSqlVectorStore : IVectorStore
 7. 结合 `EasyCore.Agent.RAG` 做 MMR / Rerank；
 8. 将召回内容注入 Agent 上下文生成答案。
 
-### 13.4 与其他向量后端对比（选型参考）
+### 11.13.4 与其他向量后端对比（选型参考）
 
 | 维度 | PostgreSQL + pgvector | 说明 |
 |---|---|---|
@@ -4285,7 +3934,7 @@ IPostgreSqlVectorStore : IVectorStore
 
 仓库内置 `AspCoreAgent` Demo，包含完整的 PostgreSQL 向量库 API 示例。
 
-### 14.1 启动 PostgreSQL + pgvector
+### 11.14.1 启动 PostgreSQL + pgvector
 
 ```bash
 docker run -d \
@@ -4297,7 +3946,7 @@ docker run -d \
   pgvector/pgvector:pg17
 ```
 
-### 14.2 配置连接字符串
+### 11.14.2 配置连接字符串
 
 在 `demo/AspCoreAgent/Program.cs` 中确认连接字符串与 Docker 配置一致：
 
@@ -4309,13 +3958,13 @@ builder.Services.EasyCorePostgreSql(options =>
 });
 ```
 
-### 14.3 启动 Demo
+### 11.14.3 启动 Demo
 
 ```bash
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ```
 
-### 14.4 相关 API 端点
+### 11.14.4 相关 API 端点
 
 | 端点 | 说明 |
 |---|---|
@@ -4336,6 +3985,7 @@ Demo 实体定义见 `demo/AspCoreAgent/VectorEntity/PostgreSqlTextVector.cs`。
 ---
 
 ## 12. EasyCore.Vector.Elasticsearch
+
 ### 12.1 项目简介
 
 ### 🎯 解决什么问题？
@@ -4367,59 +4017,17 @@ EasyCore.Agent（Agent SDK）
 
 ## 12.2 架构图
 
-### 2.1 组件关系图
+### 12.2.1 组件关系图
 
-```mermaid
-flowchart TB
-    subgraph App["ASP.NET Core 应用"]
-        Controller["Controller / Service"]
-        Entity["ElasticsearchTextVector : ElasticsearchVectorRecord"]
-    end
+![2-1-组件关系图](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-组件关系图-5d67ae37.svg)
 
-    subgraph DI["依赖注入"]
-        Ext["EasyCoreElasticsearch(...)"]
-        Options["ElasticsearchOptions"]
-        Store["IElasticsearchVectorStore"]
-    end
 
-    subgraph ES["Elasticsearch 8+"]
-        Index["Index（Collection）<br/>小写规范化名称"]
-        Doc["Document 文档<br/>_id = Record.Id"]
-        KNN["KNN dense_vector 检索"]
-        Filter["Bool / Term / Range 过滤"]
-    end
+### 12.2.2 一次向量检索时序
 
-    Controller --> Store
-    Entity --> Store
-    Ext --> Options
-    Ext --> Store
-    Store --> Index
-    Store --> Doc
-    Index --> KNN
-    Index --> Filter
-```
+![2-2-一次向量检索时序](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-一次向量检索时序-a3c2fa45.svg)
 
-### 2.2 一次向量检索时序
 
-```mermaid
-sequenceDiagram
-    participant App as 业务代码
-    participant Store as ElasticsearchVectorStore
-    participant Client as Elastic.Clients.Elasticsearch
-    participant ES as Elasticsearch
-
-    App->>Store: VectorSearchAsync(collection, vectorName, vector, options)
-    Store->>Store: ToIndexName(collection) + BuildFilterQuery(options.Filter)
-    Store->>Store: 构建 KnnSearch（k, num_candidates, filter）
-    Store->>Client: SearchAsync(indexName, knn + min_score)
-    Client->>ES: POST /{index}/_search
-    ES-->>Client: hits + _score
-    Client-->>Store: SearchResponse
-    Store->>Store: ReadSearchResults + ScoreThreshold 过滤
-    Store-->>App: List<ElasticsearchVectorSearchResult<TRecord>>
-```
-
-### 2.3 存储模型
+### 12.2.3 存储模型
 
 每个 Collection 在 Elasticsearch 中的组织方式：
 
@@ -4449,7 +4057,7 @@ sequenceDiagram
 
 ## 12.4 环境要求
 
-### 4.1 Elasticsearch 版本
+### 12.4.1 Elasticsearch 版本
 
 需要 **Elasticsearch 8.0 及以上**（支持 `dense_vector` 索引与 KNN 检索）。
 
@@ -4466,11 +4074,11 @@ docker run -d --name elasticsearch \
 
 > 生产环境请启用安全认证，并在 `ElasticsearchOptions` 中配置 `UserName` / `Password`。
 
-### 4.2 .NET 版本
+### 12.4.2 .NET 版本
 
 - .NET 8.0 及以上
 
-### 4.3 NuGet 依赖
+### 12.4.3 NuGet 依赖
 
 | 包 | 版本 | 用途 |
 |---|---|---|
@@ -4481,19 +4089,13 @@ docker run -d --name elasticsearch \
 
 ## 12.5 快速开始
 
-### 5.1 安装包
+### 12.5.1 安装包
 
 ```bash
 dotnet add package EasyCore.Vector.Elasticsearch
 ```
 
-或在解决方案中直接引用项目：
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Elasticsearch\EasyCore.Vector.Elasticsearch.csproj" />
-```
-
-### 5.2 注册服务
+### 12.5.2 注册服务
 
 ```csharp
 using EasyCore.Vector.Elasticsearch;
@@ -4506,7 +4108,7 @@ builder.Services.EasyCoreElasticsearch(options =>
 });
 ```
 
-### 5.3 定义向量实体
+### 12.5.3 定义向量实体
 
 ```csharp
 using EasyCore.Vector.Elasticsearch;
@@ -4522,7 +4124,7 @@ public sealed class ElasticsearchTextVector : ElasticsearchVectorRecord
 
 > `ElasticsearchVectorRecord` 已内置 `Id`、`Content`、`Vectors`，子类只需声明业务标量字段。
 
-### 5.4 创建 Collection 并写入数据
+### 12.5.4 创建 Collection 并写入数据
 
 ```csharp
 public class KnowledgeService
@@ -4580,7 +4182,7 @@ public class KnowledgeService
 }
 ```
 
-### 5.5 向量检索
+### 12.5.5 向量检索
 
 ```csharp
 var queryEmbedding = await embeddingClient.EmbedAsync("EasyCore.Agent 支持哪些功能？");
@@ -4606,7 +4208,7 @@ foreach (var item in results)
 
 ## 12.6 配置说明
 
-### 6.1 `ElasticsearchOptions`
+### 12.6.1 `ElasticsearchOptions`
 
 | 字段 | 类型 | 说明 | 示例 |
 |---|---|---|---|
@@ -4616,7 +4218,7 @@ foreach (var item in results)
 
 当 `UserName` 非空时，SDK 自动启用 Basic Authentication；`Password` 未设置时按空字符串处理。
 
-### 6.2 DI 生命周期
+### 12.6.2 DI 生命周期
 
 | 服务 | 生命周期 | 说明 |
 |---|---|---|
@@ -4627,7 +4229,7 @@ foreach (var item in results)
 
 ## 12.7 数据模型与 Collection 设计
 
-### 7.1 核心类型一览
+### 12.7.1 核心类型一览
 
 | 类型 | 说明 |
 |---|---|
@@ -4639,7 +4241,7 @@ foreach (var item in results)
 | `ElasticsearchVectorFilter` | 过滤条件容器 |
 | `ElasticsearchVectorSearchResult<TRecord>` | 检索结果（Record + Score） |
 
-### 7.2 内置字段
+### 12.7.2 内置字段
 
 创建 Collection 时，SDK 会自动追加以下字段，**无需**在业务定义中重复声明：
 
@@ -4648,7 +4250,7 @@ foreach (var item in results)
 | `Id` | `Keyword`（主键） | 文档 ID，对应 Elasticsearch `_id` |
 | `Content` | `Text` + `Content.keyword` | 文本内容，支持全文与关键词过滤 |
 
-### 7.3 向量字段配置
+### 12.7.3 向量字段配置
 
 ```csharp
 new ElasticsearchVectorFieldDefinition
@@ -4677,7 +4279,7 @@ new ElasticsearchVectorFieldDefinition
 | `Hnsw`（默认） | HNSW（`m=16`, `ef_construction=100`） | 在线检索延迟低，推荐默认 |
 | `Ivfflat` | HNSW + 调高 `ef_construction` | 通过 `Lists` 参数影响构建参数 |
 
-### 7.4 标量字段类型
+### 12.7.4 标量字段类型
 
 | `ScalarFieldType` | Elasticsearch 映射 |
 |---|---|
@@ -4687,7 +4289,7 @@ new ElasticsearchVectorFieldDefinition
 | `String` / `VarChar` | `keyword` |
 | `Json` | `object` |
 
-### 7.5 命名约束
+### 12.7.5 命名约束
 
 Collection 名与字段名必须符合标识符规则：
 
@@ -4712,7 +4314,7 @@ IElasticsearchVectorStore
               └── IElasticsearchHybridSearch
 ```
 
-### 8.1 Collection 管理
+### 12.8.1 Collection 管理
 
 ```csharp
 // 检查 Collection 是否存在
@@ -4725,7 +4327,7 @@ await _vectorStore.CreateCollectionAsync("test_collection", definition);
 await _vectorStore.DeleteCollectionAsync("test_collection");
 ```
 
-### 8.2 写入与删除
+### 12.8.2 写入与删除
 
 ```csharp
 // 单条 Upsert
@@ -4738,7 +4340,7 @@ await _vectorStore.UpsertBatchAsync("test_collection", records);
 await _vectorStore.DeleteAsync("test_collection", recordId);
 ```
 
-### 8.3 按 Id 获取
+### 12.8.3 按 Id 获取
 
 ```csharp
 var record = await _vectorStore.GetAsync<ElasticsearchTextVector>(
@@ -4749,7 +4351,7 @@ var record = await _vectorStore.GetAsync<ElasticsearchTextVector>(
     includeMetadata: true);
 ```
 
-### 8.4 标量 Query（不含向量相似度）
+### 12.8.4 标量 Query（不含向量相似度）
 
 ```csharp
 var records = await _vectorStore.QueryAsync<ElasticsearchTextVector>(
@@ -4771,7 +4373,7 @@ var records = await _vectorStore.QueryAsync<ElasticsearchTextVector>(
     includeMetadata: true);
 ```
 
-### 8.5 向量检索（带 Filter）
+### 12.8.5 向量检索（带 Filter）
 
 ```csharp
 var options = new ElasticsearchVectorSearchOptions
@@ -4802,7 +4404,7 @@ var results = await _vectorStore.VectorSearchAsync<ElasticsearchTextVector>(
     options);
 ```
 
-### 8.6 混合检索（Hybrid Search）
+### 12.8.6 混合检索（Hybrid Search）
 
 Hybrid Search 适用于「语义相似 + 关键词命中」Combined Ranking 场景。BM25 候选可由 `QueryAsync` + `Contains` 等方式获得，再与向量结果融合：
 
@@ -4847,7 +4449,7 @@ var hybridResults = await _vectorStore.HybridSearchAsync(
 
 融合算法会对向量分与 BM25 分分别归一化后加权求和，返回 Top-K 结果。
 
-### 8.7 同步 API
+### 12.8.7 同步 API
 
 所有 `Async` 方法均提供同步版本，例如：
 
@@ -4863,7 +4465,7 @@ var results = _vectorStore.VectorSearch<ElasticsearchTextVector>("test_collectio
 
 ## 12.9 过滤与检索能力详解
 
-### 9.1 支持的 Filter 运算符
+### 12.9.1 支持的 Filter 运算符
 
 | 运算符 | 说明 | 适用字段类型 | 示例 |
 |---|---|---|---|
@@ -4880,7 +4482,7 @@ var results = _vectorStore.VectorSearch<ElasticsearchTextVector>("test_collectio
 
 > `Content` 字段过滤自动路由至 `Content.keyword` 子字段；`Contains` 使用大小写不敏感通配符查询。
 
-### 9.2 `ElasticsearchVectorSearchOptions` 参数
+### 12.9.2 `ElasticsearchVectorSearchOptions` 参数
 
 | 字段 | 默认值 | 说明 |
 |---|---|---|
@@ -4891,7 +4493,7 @@ var results = _vectorStore.VectorSearch<ElasticsearchTextVector>("test_collectio
 | `IncludeVector` | `false` | 是否在结果中包含向量数据 |
 | `IncludeMetadata` | `true` | 是否包含自定义标量字段 |
 
-### 9.3 向量检索执行流程
+### 12.9.3 向量检索执行流程
 
 1. 将 `collectionName` 规范化为 Elasticsearch Index 名；
 2. 根据 `Filter` 构建 Bool / Term / Range / Wildcard 查询；
@@ -5021,7 +4623,7 @@ Collection 名、字段名必须符合 `^[A-Za-z_][A-Za-z0-9_]*$`，请勿使用
 
 ## 12.13 EasyCore.Vector.Elasticsearch 详细介绍
 
-### 13.1 设计目标
+### 12.13.1 设计目标
 
 `EasyCore.Vector.Elasticsearch` 的核心目标是：在 .NET 应用中提供**生产可用**的 Elasticsearch 向量存储封装，并与 EasyCore 其他向量后端保持 API 一致，使 RAG 业务代码可以跨存储引擎迁移。
 
@@ -5032,7 +4634,7 @@ Collection 名、字段名必须符合 `^[A-Za-z_][A-Za-z0-9_]*$`，请勿使用
 3. **检索表达**：屏蔽 KNN + Bool Filter DSL 细节；
 4. **可组合性**：向量检索、标量 Query、Hybrid 融合分层接口，便于扩展。
 
-### 13.2 接口分层
+### 12.13.2 接口分层
 
 ```
 IElasticsearchHybridSearch
@@ -5050,7 +4652,7 @@ IElasticsearchVectorStore : IVectorStore
   └── （标记接口，DI 注入使用）
 ```
 
-### 13.3 典型落地步骤
+### 12.13.3 典型落地步骤
 
 1. 部署 Elasticsearch 8+，配置 `Url`（及认证信息）；
 2. 调用 `EasyCoreElasticsearch` 注册 DI；
@@ -5061,7 +4663,7 @@ IElasticsearchVectorStore : IVectorStore
 7. 结合 `EasyCore.Agent.RAG` 做 MMR / Rerank；
 8. 将召回内容注入 Agent 上下文生成答案。
 
-### 13.4 与其他向量后端对比（选型参考）
+### 12.13.4 与其他向量后端对比（选型参考）
 
 | 维度 | Elasticsearch | 说明 |
 |---|---|---|
@@ -5077,7 +4679,7 @@ IElasticsearchVectorStore : IVectorStore
 
 仓库内置 `AspCoreAgent` Demo，包含完整的 Elasticsearch 向量库 API 示例。
 
-### 14.1 启动 Elasticsearch
+### 12.14.1 启动 Elasticsearch
 
 ```bash
 docker run -d --name elasticsearch \
@@ -5087,7 +4689,7 @@ docker run -d --name elasticsearch \
   docker.elastic.co/elasticsearch/elasticsearch:8.15.0
 ```
 
-### 14.2 启动 Demo
+### 12.14.2 启动 Demo
 
 在 `Program.cs` 中确认 Elasticsearch 地址：
 
@@ -5102,7 +4704,7 @@ builder.Services.EasyCoreElasticsearch(options =>
 dotnet run --project demo/AspCoreAgent/AspCoreAgent.csproj
 ```
 
-### 14.3 相关 API 端点
+### 12.14.3 相关 API 端点
 
 | 端点 | 说明 |
 |---|---|

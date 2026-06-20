@@ -81,12 +81,12 @@ It shares a consistent API style with other vector backends (Redis, Milvus, Post
 
 ### 2.1 Component Diagram
 
-![2-1-component-diagram](docs/svg/2-1-component-diagram-acd281f2.svg)
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-acd281f2.svg)
 
 
 ### 2.2 Hybrid Search Sequence (Dense + Sparse)
 
-![2-2-hybrid-search-sequence-dense-sparse](docs/svg/2-2-hybrid-search-sequence-dense-sparse-03c9f719.svg)
+![2-2-hybrid-search-sequence-dense-sparse](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-hybrid-search-sequence-dense-sparse-03c9f719.svg)
 
 
 ### 2.3 Storage Model
@@ -151,12 +151,6 @@ docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 ```bash
 dotnet add package EasyCore.Vector.Qdrant
-```
-
-Or reference the project directly in your solution:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Qdrant\EasyCore.Vector.Qdrant.csproj" />
 ```
 
 ### 5.2 Register Services

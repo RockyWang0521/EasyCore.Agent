@@ -70,7 +70,7 @@ This library does **not** bind to a specific vector database and requires **no**
 
 ### 2.1 RAG Pipeline Overview
 
-![2-1-rag-pipeline-overview](docs/svg/2-1-rag-pipeline-overview-30723cd3.svg)
+![2-1-rag-pipeline-overview](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-rag-pipeline-overview-30723cd3.svg)
 
 
 ### 2.2 Module Responsibilities
@@ -84,7 +84,7 @@ This library does **not** bind to a specific vector database and requires **no**
 
 ### 2.3 Query Rewrite Sequence
 
-![2-3-query-rewrite-sequence](docs/svg/2-3-query-rewrite-sequence-ce95c915.svg)
+![2-3-query-rewrite-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-3-query-rewrite-sequence-ce95c915.svg)
 
 
 ---
@@ -129,12 +129,6 @@ This library does **not** bind to a specific vector database and requires **no**
 
 ```bash
 dotnet add package EasyCore.Agent.RAG
-```
-
-Or reference the project:
-
-```xml
-<ProjectReference Include="..\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
 ```
 
 ### 5.2 Document Chunking
@@ -419,7 +413,7 @@ var userPrompt = MultiQueryPromptBuilder.BuildUserPrompt(query, count: 5);
 
 ## 8. Full RAG Pipeline
 
-![8-full-rag-pipeline](docs/svg/8-full-rag-pipeline-40aa053a.svg)
+![8-full-rag-pipeline](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/8-full-rag-pipeline-40aa053a.svg)
 
 
 **Recommended combinations:**

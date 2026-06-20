@@ -67,12 +67,12 @@ This library does **not** depend on LLM or Agent runtime. Use it with `EasyCore.
 
 ### 2.1 Component Diagram
 
-![2-1-component-diagram](docs/svg/2-1-component-diagram-6f2f0d68.svg)
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-6f2f0d68.svg)
 
 
 ### 2.2 Pipeline Execution Sequence
 
-![2-2-pipeline-execution-sequence](docs/svg/2-2-pipeline-execution-sequence-20db5d37.svg)
+![2-2-pipeline-execution-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-pipeline-execution-sequence-20db5d37.svg)
 
 
 ### 2.3 Branch + Parallel Flow (Demo)
@@ -124,13 +124,7 @@ Pure .NET class library — **no third-party NuGet packages**.
 
 ## 5. Quick Start
 
-### 5.1 Reference the Project
-
-```bash
-dotnet add reference ../EasyCore.Pipeline/EasyCore.Pipeline.csproj
-```
-
-Or install the NuGet package (when published):
+### 5.1 Install the Package
 
 ```bash
 dotnet add package EasyCore.Pipeline

@@ -69,12 +69,12 @@ It shares a consistent API style with other vector backends (Qdrant, Milvus, Pos
 
 ### 2.1 Component Diagram
 
-![2-1-component-diagram](docs/svg/2-1-component-diagram-b97986d2.svg)
+![2-1-component-diagram](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-1-component-diagram-b97986d2.svg)
 
 
 ### 2.2 Vector Search Sequence
 
-![2-2-vector-search-sequence](docs/svg/2-2-vector-search-sequence-1033e99e.svg)
+![2-2-vector-search-sequence](https://raw.githubusercontent.com/RockyWang0521/EasyCore.Agent/master/docs/svg/2-2-vector-search-sequence-1033e99e.svg)
 
 
 ### 2.3 Storage Model
@@ -137,12 +137,6 @@ docker run -d --name redis-stack -p 6379:6379 redis/redis-stack:latest
 
 ```bash
 dotnet add package EasyCore.Vector.Redis
-```
-
-Or reference the project directly in your solution:
-
-```xml
-<ProjectReference Include="..\EasyCore.Vector.Redis\EasyCore.Vector.Redis.csproj" />
 ```
 
 ### 5.2 Register Services
