@@ -5,9 +5,6 @@ using EasyCore.Agent;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.AI;
-using Microsoft.ML.OnnxRuntime;
-using Microsoft.ML.OnnxRuntime.Tensors;
-using OpenCvSharp;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
