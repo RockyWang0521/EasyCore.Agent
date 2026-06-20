@@ -19,24 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\EasyCore.Agent.RAG\EasyCore.Agent.RAG.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Agent\EasyCore.Agent\EasyCore.Agent.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Pipeline\EasyCore.Pipeline.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Vector.Milvus\EasyCore.Vector.Milvus.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Vector.Qdrant\EasyCore.Vector.Qdrant.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Vector.PostgreSQL\EasyCore.Vector.PostgreSQL.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Vector.Redis\EasyCore.Vector.Redis.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Vector.Elasticsearch\EasyCore.Vector.Elasticsearch.csproj" />
-    <ProjectReference Include="..\..\src\EasyCore.Workflow\EasyCore.Workflow.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Onnx\best.onnx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\results\" />
   </ItemGroup>
 

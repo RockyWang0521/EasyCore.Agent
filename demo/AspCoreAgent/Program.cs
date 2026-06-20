@@ -28,23 +28,7 @@ namespace AspCoreAgent
 
             builder.Services.EasyCoreDependencie();
 
-            builder.Services.AddSingleton<YoloOnnxDetector>(sp =>
-            {
-                var modelPath = Path.Combine(AppContext.BaseDirectory, "Onnx", "best.onnx");
-
-                if (!File.Exists(modelPath))
-                    throw new FileNotFoundException("ONNX ????????", modelPath);
-
-                return new YoloOnnxDetector(modelPath);
-            });
-
-            //builder.Services.EasyCoreAgent();
-
-            builder.Services.EasyCoreAgent(options =>
-            {
-                options.AgentContextStoreType = AgentContextStoreType.Redis;
-                options.EndPoints= new List<string> { "localhost:6379" };
-            });
+            builder.Services.EasyCoreAgent();
 
             builder.Services.EasyCoreMilvus(options =>
             {
@@ -81,8 +65,6 @@ namespace AspCoreAgent
             {
                 options.StateStoreType = WorkflowStateStoreType.Memory;
             });
-
-            builder.Services.AddHostedService<AspCoreAgent.Workflow.WorkflowDemoHostedService>();
 
             var app = builder.Build();
 
